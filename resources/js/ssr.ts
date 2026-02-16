@@ -7,6 +7,8 @@ import { route as ziggyRoute } from 'ziggy-js';
 
 const appName = import.meta.env.VITE_APP_NAME || 'matos.live';
 
+const ssrPort = Number(process.env.INERTIA_SSR_PORT) || 13714;
+
 createServer((page) =>
     createInertiaApp({
         page,
@@ -38,4 +40,5 @@ createServer((page) =>
             return app;
         },
     }),
+    { port: ssrPort },
 );
