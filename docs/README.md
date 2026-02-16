@@ -1,6 +1,6 @@
-# Documentation Assocation
+# Documentation matos.live
 
-Ce dossier contient la documentation technique de l'application Assocation.
+Ce dossier contient la documentation technique de l'application matos.live.
 
 ## 📚 Documentation disponible
 

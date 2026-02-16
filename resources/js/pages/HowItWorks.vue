@@ -126,7 +126,7 @@ const faqs = [
 <template>
     <Head>
         <title>Comment ça marche ? - {{ appName }}</title>
-        <meta name="description" :content="`Découvrez comment fonctionne ${appName}, la plateforme de location de matériel événementiel entre associations et particuliers.`" />
+        <meta name="description" :content="`Découvrez comment fonctionne ${appName}, la marketplace collaborative de matériel événementiel. Partagez, louez, facilitez vos événements.`" />
     </Head>
 
     <PublicLayout>
@@ -136,8 +136,8 @@ const faqs = [
                 <div class="text-center">
                     <h1 class="text-4xl font-bold text-foreground">Comment ça marche ?</h1>
                     <p class="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-                        <strong>{{ appName }}</strong> est une plateforme de mise en relation qui simplifie la recherche 
-                        et la réservation de matériel événementiel entre associations et particuliers.
+                        <strong>{{ appName }}</strong> est une marketplace collaborative qui simplifie la recherche, 
+                        le prêt et la location de matériel événementiel entre associations et particuliers.
                     </p>
                 </div>
             </div>

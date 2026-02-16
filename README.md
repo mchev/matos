@@ -1,4 +1,4 @@
-# Assocation
+# matos.live
 
 ![Laravel](https://img.shields.io/badge/Laravel-12.x-red?logo=laravel)
 ![Vue 3](https://img.shields.io/badge/Vue-3.x-42b883?logo=vue.js)
@@ -6,9 +6,9 @@
 ![Tailwind CSS](https://img.shields.io/badge/TailwindCSS-4.x-38bdf8?logo=tailwindcss)
 ![shadcn-vue](https://img.shields.io/badge/shadcn--vue-%23f5f5f5?logo=vue.js)
 
----
+**Le matériel de vos événements, en un clic.**
 
-**Assocation** est une plateforme moderne de gestion et de réservation de matériel pour associations, clubs et collectivités. Elle facilite la mutualisation, la réservation, et la gestion d'inventaire de matériel, avec une intégration avancée HelloAsso pour la synchronisation des organisations.
+**matos.live** est une marketplace collaborative de matériel événementiel pour associations et particuliers. Partagez, louez, facilitez vos événements — avec une intégration HelloAsso pour la synchronisation des organisations.
 
 ## 🚀 Fonctionnalités principales
 
@@ -52,8 +52,8 @@
 ### Installation
 ```bash
 # Cloner le repo
- git clone https://github.com/votre-org/assocation.git
- cd assocation
+ git clone https://github.com/votre-org/matos.git
+ cd matos
 
 # Installer les dépendances PHP
  composer install

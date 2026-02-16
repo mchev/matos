@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://assocation.fr/sitemap.xml
+Sitemap: https://matos.live/sitemap.xml
 
 # Disallow admin and private areas
 Disallow: /admin/

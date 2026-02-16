@@ -1,7 +1,7 @@
 <template>
   <AppLayout 
     title="FAQ - Questions fréquentes | Location de matériel événementiel"
-    description="Trouvez toutes les réponses à vos questions sur la location et le prêt de matériel événementiel entre associations. Comment ça marche, tarifs, sécurité et plus encore."
+    description="Trouvez toutes les réponses sur la location et le prêt de matériel événementiel. Comment ça marche, tarifs, sécurité et plus."
   >
     <Head>
       <component v-bind:is="script" type="application/ld+json">
@@ -209,7 +209,7 @@
                 Comment signaler un utilisateur problématique ?
               </AccordionTrigger>
               <AccordionContent>
-                <p>Si vous rencontrez un utilisateur problématique, vous pouvez nous contacter à <a href="mailto:contact@assocation.fr" class="text-primary hover:underline">contact@assocation.fr</a>.</p>
+                <p>Si vous rencontrez un utilisateur problématique, vous pouvez nous contacter à <a :href="`mailto:${contactEmail}`" class="text-primary hover:underline">{{ contactEmail }}</a>.</p>
                 <p class="mt-2">Nous examinerons la situation et prendrons les mesures appropriées pour maintenir la qualité de la communauté.</p>
                 <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
                   N'hésitez pas à nous fournir tous les détails utiles pour nous aider à traiter votre signalement.
@@ -275,7 +275,7 @@
           Notre équipe est là pour vous aider. N'hésitez pas à nous contacter pour toute question supplémentaire.
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button as="a" href="mailto:contact@assocation.fr" class="font-semibold">
+          <Button as="a" :href="`mailto:${contactEmail}`" class="font-semibold">
             <MailIcon class="mr-2 h-4 w-4" />
             Nous contacter
           </Button>
@@ -290,8 +290,11 @@
 </template>
 
 <script setup>
-import { Head } from '@inertiajs/vue3';
+import { Head, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
+
+const page = usePage();
+const contactEmail = page.props.contact_email || 'contact@matos.live';
 import { 
   Accordion, 
   AccordionContent, 
@@ -373,7 +376,7 @@ const schemaMarkup = JSON.stringify({
       "name": "Comment signaler un utilisateur problématique ?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Si vous rencontrez un utilisateur problématique, vous pouvez nous contacter à contact@assocation.fr. Nous examinerons la situation et prendrons les mesures appropriées pour maintenir la qualité de la communauté."
+        "text": `Si vous rencontrez un utilisateur problématique, vous pouvez nous contacter à ${contactEmail}. Nous examinerons la situation et prendrons les mesures appropriées pour maintenir la qualité de la communauté.`
       }
     },
     {

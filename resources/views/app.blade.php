@@ -30,7 +30,7 @@
             }
         </style>
 
-        <title inertia>{{ config('app.name', 'Laravel') }}</title>
+        <title inertia>{{ config('app.name', 'matos.live') }}</title>
         <meta inertia name="description" content="{{ config('app.description') }}">
 
         <link rel="icon" href="/favicon.ico" sizes="any">

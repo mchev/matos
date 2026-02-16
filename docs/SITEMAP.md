@@ -2,7 +2,7 @@
 
 ## Vue d'ensemble
 
-Le système de sitemap de l'application Assocation est conçu pour générer automatiquement des sitemaps XML optimisés pour le SEO, incluant toutes les pages statiques et le contenu dynamique (équipements). Le système est configurable, performant et extensible.
+Le système de sitemap de l'application matos.live est conçu pour générer automatiquement des sitemaps XML optimisés pour le SEO, incluant toutes les pages statiques et le contenu dynamique (équipements). Le système est configurable, performant et extensible.
 
 ## Architecture
 
@@ -258,7 +258,7 @@ php artisan test --filter=SitemapTest
 ### robots.txt
 Le fichier `public/robots.txt` référence le sitemap :
 ```
-Sitemap: https://assocation.fr/sitemap.xml
+Sitemap: https://matos.live/sitemap.xml
 ```
 
 ### Soumission aux moteurs de recherche

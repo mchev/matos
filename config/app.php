@@ -13,10 +13,12 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => env('APP_NAME', 'matos.live'),
     'version' => env('APP_VERSION', '1.0.0'),
     'url' => env('APP_URL', 'http://localhost'),
-    'description' => env('APP_DESCRIPTION', env('APP_NAME').' facilite la location de matériel entre associations. Trouvez et réservez en quelques clics le matériel dont vous avez besoin pour vos événements.'),
+    'slogan' => env('APP_SLOGAN', 'Le matériel de vos événements, en un clic'),
+    'description' => env('APP_DESCRIPTION', 'Location et prêt de matériel entre associations et particuliers. Partagez, louez, facilitez vos événements.'),
+    'contact_email' => env('APP_CONTACT_EMAIL', 'contact@matos.live'),
 
     /*
     |--------------------------------------------------------------------------

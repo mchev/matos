@@ -48,7 +48,7 @@ const features = [
 <template>
     <Head>
         <title>Découvrir la plateforme - {{ appName }}</title>
-        <meta name="description" :content="`Découvrez ${appName}, la plateforme de location de matériel événementiel qui connecte les associations et les particuliers.`" />
+        <meta name="description" :content="`Découvrez ${appName}, la marketplace de matériel événementiel. Partagez, louez, facilitez vos événements.`" />
     </Head>
 
     <PublicLayout>
@@ -60,7 +60,7 @@ const features = [
                         Trouvez le matériel idéal pour votre événement
                     </h1>
                     <p class="mt-4 text-lg text-muted-foreground">
-                        {{ appName }} vous connecte avec une communauté d'associations et de particuliers pour partager du matériel événementiel de qualité.
+                        {{ appName }} vous connecte avec une communauté d'associations et de particuliers pour partager ou louer du matériel événementiel.
                     </p>
                 </div>
             </div>

@@ -1,7 +1,7 @@
 <template>
   <AppLayout 
     title="Location et prêt de matériel événementiel" 
-    :description="`${appName} facilite la location de matériel entre associations. Trouvez et réservez en quelques clics le matériel dont vous avez besoin pour vos événements.`"
+    :description="page.props.description || `${appName} — Le matériel de vos événements, en un clic. Partagez, louez, facilitez vos événements.`"
   >
 
       <!-- Hero Section -->
