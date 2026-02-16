@@ -1,15 +1,16 @@
-import { createHeadManager, router, isUrlMethodPair, formDataToObject, getScrollableParent, useInfiniteScroll, config as config$1, mergeDataIntoQueryString, resetFormFields, shouldIntercept, shouldNavigate, setupProgress } from "@inertiajs/core";
+import { createHeadManager, router, config as config$1, isUrlMethodPair, formDataToObject, mergeDataIntoQueryString, getScrollableParent, useInfiniteScroll, UseFormUtils, FormComponentResetSymbol, resetFormFields, shouldIntercept, shouldNavigate, getInitialPageFromDOM, setupProgress } from "@inertiajs/core";
 import require$$0 from "@vue/compiler-dom";
 import require$$1 from "@vue/runtime-dom";
 import require$$2 from "@vue/shared";
 import { escape as escape$1, cloneDeep, has, set, get, isEqual } from "lodash-es";
+import { createValidator, toSimpleValidationErrors, resolveName } from "laravel-precognition";
 import createServer from "@inertiajs/core/server";
 import require$$2$1 from "@vue/compiler-ssr";
 import require$$3 from "node:stream";
 var vue = { exports: {} };
 var vue_cjs_prod = {};
 /**
-* vue v3.5.25
+* vue v3.5.28
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
 **/
@@ -77,7 +78,7 @@ function requireVue_cjs_prod() {
 }
 var vue_cjs = {};
 /**
-* vue v3.5.25
+* vue v3.5.28
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
 **/
@@ -215,14 +216,34 @@ var remember = {
   }
 };
 var remember_default = remember;
-function useForm(rememberKeyOrData, maybeData) {
-  const rememberKey = typeof rememberKeyOrData === "string" ? rememberKeyOrData : null;
-  const data = (typeof rememberKeyOrData === "string" ? maybeData : rememberKeyOrData) ?? {};
+var reservedFormKeys = null;
+var bootstrapping = false;
+function validateFormDataKeys(data) {
+  if (bootstrapping) {
+    return;
+  }
+  if (reservedFormKeys === null) {
+    bootstrapping = true;
+    reservedFormKeys = new Set(Object.keys(useForm({})));
+    bootstrapping = false;
+  }
+  const conflicts = Object.keys(data).filter((key2) => reservedFormKeys.has(key2));
+  if (conflicts.length > 0) {
+    console.error(
+      `[Inertia] useForm() data contains field(s) that conflict with form properties: ${conflicts.map((k) => `"${k}"`).join(", ")}. These fields will be overwritten by form methods/properties. Please rename these fields.`
+    );
+  }
+}
+function useForm(...args) {
+  let { rememberKey, data, precognitionEndpoint } = UseFormUtils.parseUseFormArguments(...args);
   const restored = rememberKey ? router.restore(rememberKey) : null;
   let defaults = typeof data === "function" ? cloneDeep(data()) : cloneDeep(data);
+  validateFormDataKeys(defaults);
   let cancelToken = null;
   let recentlySuccessfulTimeoutId;
   let transform = (data2) => data2;
+  let validatorRef = null;
+  let rememberExcludeKeys = [];
   let defaultsCalledInOnSuccess = false;
   const form = vueExports.reactive({
     ...restored ? restored.data : cloneDeep(defaults),
@@ -233,6 +254,76 @@ function useForm(rememberKeyOrData, maybeData) {
     progress: null,
     wasSuccessful: false,
     recentlySuccessful: false,
+    withPrecognition(...args2) {
+      precognitionEndpoint = UseFormUtils.createWayfinderCallback(...args2);
+      const formWithPrecognition = this;
+      let withAllErrors = null;
+      const validator = createValidator((client) => {
+        const { method, url } = precognitionEndpoint();
+        const transformedData = cloneDeep(transform(this.data()));
+        return client[method](url, transformedData);
+      }, cloneDeep(defaults));
+      validatorRef = validator;
+      validator.on("validatingChanged", () => {
+        formWithPrecognition.validating = validator.validating();
+      }).on("validatedChanged", () => {
+        formWithPrecognition.__valid = validator.valid();
+      }).on("touchedChanged", () => {
+        formWithPrecognition.__touched = validator.touched();
+      }).on("errorsChanged", () => {
+        const validationErrors = withAllErrors ?? config.get("form.withAllErrors") ? validator.errors() : toSimpleValidationErrors(validator.errors());
+        this.errors = {};
+        this.setError(validationErrors);
+        formWithPrecognition.__valid = validator.valid();
+      });
+      const tap = (value, callback) => {
+        callback(value);
+        return value;
+      };
+      Object.assign(formWithPrecognition, {
+        __touched: [],
+        __valid: [],
+        validating: false,
+        validator: () => validator,
+        withAllErrors: () => tap(formWithPrecognition, () => withAllErrors = true),
+        valid: (field) => formWithPrecognition.__valid.includes(field),
+        invalid: (field) => field in this.errors,
+        setValidationTimeout: (duration) => tap(formWithPrecognition, () => validator.setTimeout(duration)),
+        validateFiles: () => tap(formWithPrecognition, () => validator.validateFiles()),
+        withoutFileValidation: () => tap(formWithPrecognition, () => validator.withoutFileValidation()),
+        touch: (field, ...fields) => {
+          if (Array.isArray(field)) {
+            validator.touch(field);
+          } else if (typeof field === "string") {
+            validator.touch([field, ...fields]);
+          } else {
+            validator.touch(field);
+          }
+          return formWithPrecognition;
+        },
+        touched: (field) => typeof field === "string" ? formWithPrecognition.__touched.includes(field) : formWithPrecognition.__touched.length > 0,
+        validate: (field, config3) => {
+          if (typeof field === "object" && !("target" in field)) {
+            config3 = field;
+            field = void 0;
+          }
+          if (field === void 0) {
+            validator.validate(config3);
+          } else {
+            const fieldName = resolveName(field);
+            const transformedData = transform(this.data());
+            validator.validate(fieldName, get(transformedData, fieldName), config3);
+          }
+          return formWithPrecognition;
+        },
+        setErrors: (errors) => tap(formWithPrecognition, () => this.setError(errors)),
+        forgetError: (field) => tap(
+          formWithPrecognition,
+          () => this.clearErrors(resolveName(field))
+        )
+      });
+      return formWithPrecognition;
+    },
     data() {
       return Object.keys(defaults).reduce((carry, key2) => {
         return set(carry, key2, get(this, key2));
@@ -253,6 +344,7 @@ function useForm(rememberKeyOrData, maybeData) {
       } else {
         defaults = typeof fieldOrFields === "string" ? set(cloneDeep(defaults), fieldOrFields, maybeValue) : Object.assign({}, cloneDeep(defaults), fieldOrFields);
       }
+      validatorRef == null ? void 0 : validatorRef.defaults(defaults);
       return this;
     },
     reset(...fields) {
@@ -267,11 +359,14 @@ function useForm(rememberKeyOrData, maybeData) {
           set(this, key2, get(resolvedData, key2));
         });
       }
+      validatorRef == null ? void 0 : validatorRef.reset(...fields);
       return this;
     },
     setError(fieldOrFields, maybeValue) {
-      Object.assign(this.errors, typeof fieldOrFields === "string" ? { [fieldOrFields]: maybeValue } : fieldOrFields);
+      const errors = typeof fieldOrFields === "string" ? { [fieldOrFields]: maybeValue } : fieldOrFields;
+      Object.assign(this.errors, errors);
       this.hasErrors = Object.keys(this.errors).length > 0;
+      validatorRef == null ? void 0 : validatorRef.setErrors(errors);
       return this;
     },
     clearErrors(...fields) {
@@ -283,6 +378,13 @@ function useForm(rememberKeyOrData, maybeData) {
         {}
       );
       this.hasErrors = Object.keys(this.errors).length > 0;
+      if (validatorRef) {
+        if (fields.length === 0) {
+          validatorRef.setErrors({});
+        } else {
+          fields.forEach(validatorRef.forgetError);
+        }
+      }
       return this;
     },
     resetAndClearErrors(...fields) {
@@ -290,11 +392,8 @@ function useForm(rememberKeyOrData, maybeData) {
       this.clearErrors(...fields);
       return this;
     },
-    submit(...args) {
-      const objectPassed = args[0] !== null && typeof args[0] === "object";
-      const method = objectPassed ? args[0].method : args[0];
-      const url = objectPassed ? args[0].url : args[1];
-      const options = (objectPassed ? args[1] : args[2]) ?? {};
+    submit(...args2) {
+      const { method, url, options } = UseFormUtils.parseSubmitArguments(args2, precognitionEndpoint);
       defaultsCalledInOnSuccess = false;
       const _options = {
         ...options,
@@ -319,7 +418,7 @@ function useForm(rememberKeyOrData, maybeData) {
           }
         },
         onProgress: (event) => {
-          this.progress = event;
+          this.progress = event ?? null;
           if (options.onProgress) {
             return options.onProgress(event);
           }
@@ -392,26 +491,39 @@ function useForm(rememberKeyOrData, maybeData) {
         cancelToken.cancel();
       }
     },
+    dontRemember(...keys) {
+      rememberExcludeKeys = keys;
+      return this;
+    },
     __rememberable: rememberKey === null,
     __remember() {
-      return { data: this.data(), errors: this.errors };
+      const data2 = this.data();
+      if (rememberExcludeKeys.length > 0) {
+        const filtered = { ...data2 };
+        rememberExcludeKeys.forEach((k) => delete filtered[k]);
+        return { data: filtered, errors: this.errors };
+      }
+      return { data: data2, errors: this.errors };
     },
     __restore(restored2) {
       Object.assign(this, restored2.data);
       this.setError(restored2.errors);
     }
   });
+  const typedForm = form;
   vueExports.watch(
-    form,
+    typedForm,
     (newValue) => {
-      form.isDirty = !isEqual(form.data(), defaults);
-      if (rememberKey) {
-        router.remember(cloneDeep(newValue.__remember()), rememberKey);
+      typedForm.isDirty = !isEqual(typedForm.data(), defaults);
+      const storedData = router.restore(rememberKey);
+      const newData = cloneDeep(newValue.__remember());
+      if (rememberKey && !isEqual(storedData, newData)) {
+        router.remember(newData, rememberKey);
       }
     },
     { immediate: true, deep: true }
   );
-  return form;
+  return precognitionEndpoint ? typedForm.withPrecognition(precognitionEndpoint) : typedForm;
 }
 var component = vueExports.ref(void 0);
 var page = vueExports.ref();
@@ -447,7 +559,7 @@ var App = vueExports.defineComponent({
   },
   setup({ initialPage, initialComponent, resolveComponent, titleCallback, onHeadUpdate }) {
     component.value = initialComponent ? vueExports.markRaw(initialComponent) : void 0;
-    page.value = initialPage;
+    page.value = { ...initialPage, flash: initialPage.flash ?? {} };
     key.value = void 0;
     const isServer = typeof window === "undefined";
     headManager = createHeadManager(isServer, titleCallback || ((title) => title), onHeadUpdate || (() => {
@@ -460,6 +572,9 @@ var App = vueExports.defineComponent({
           component.value = vueExports.markRaw(options.component);
           page.value = options.page;
           key.value = options.preserveState ? key.value : Date.now();
+        },
+        onFlash: (flash) => {
+          page.value = { ...page.value, flash };
         }
       });
       router.on("navigate", () => headManager.forceUpdate());
@@ -548,6 +663,10 @@ function usePage() {
     encryptHistory: vueExports.computed(() => {
       var _a;
       return (_a = page.value) == null ? void 0 : _a.encryptHistory;
+    }),
+    flash: vueExports.computed(() => {
+      var _a;
+      return (_a = page.value) == null ? void 0 : _a.flash;
     })
   });
 }
@@ -563,8 +682,8 @@ async function createInertiaApp({
 }) {
   config.replace(defaults);
   const isServer = typeof window === "undefined";
-  const el = isServer ? null : document.getElementById(id);
-  const initialPage = page2 || JSON.parse((el == null ? void 0 : el.dataset.page) || "{}");
+  const useScriptElementForInitialPage = config.get("future.useScriptElementForInitialPage");
+  const initialPage = page2 || getInitialPageFromDOM(id, useScriptElementForInitialPage);
   const resolveComponent = (name) => Promise.resolve(resolve(name)).then((module) => module.default || module);
   let head = [];
   const vueApp = await Promise.all([
@@ -589,7 +708,7 @@ async function createInertiaApp({
     }
     const csrSetup = setup;
     return csrSetup({
-      el,
+      el: document.getElementById(id),
       App: app_default,
       props,
       plugin
@@ -599,13 +718,29 @@ async function createInertiaApp({
     setupProgress(progress2);
   }
   if (isServer && render) {
-    const body = await render(
-      vueExports.createSSRApp({
-        render: () => vueExports.h("div", {
+    const element = () => {
+      if (!useScriptElementForInitialPage) {
+        return vueExports.h("div", {
           id,
           "data-page": JSON.stringify(initialPage),
           innerHTML: vueApp ? render(vueApp) : ""
+        });
+      }
+      return [
+        vueExports.h("script", {
+          "data-page": id,
+          type: "application/json",
+          innerHTML: JSON.stringify(initialPage).replace(/\//g, "\\/")
+        }),
+        vueExports.h("div", {
+          id,
+          innerHTML: vueApp ? render(vueApp) : ""
         })
+      ];
+    };
+    const body = await render(
+      vueExports.createSSRApp({
+        render: () => element()
       })
     );
     return { head, body };
@@ -629,6 +764,7 @@ vueExports.defineComponent({
   }
 });
 var noop = () => void 0;
+var FormContextKey = /* @__PURE__ */ Symbol("InertiaFormContext");
 vueExports.defineComponent({
   name: "Form",
   slots: Object,
@@ -720,10 +856,35 @@ vueExports.defineComponent({
     invalidateCacheTags: {
       type: [String, Array],
       default: () => []
+    },
+    validateFiles: {
+      type: Boolean,
+      default: false
+    },
+    validationTimeout: {
+      type: Number,
+      default: 1500
+    },
+    withAllErrors: {
+      type: Boolean,
+      default: null
     }
   },
   setup(props, { slots, attrs, expose }) {
-    const form = useForm({});
+    const getTransformedData = () => {
+      const [_url, data] = getUrlAndData();
+      return props.transform(data);
+    };
+    const form = useForm({}).withPrecognition(
+      () => method.value,
+      () => getUrlAndData()[0]
+    ).transform(getTransformedData).setValidationTimeout(props.validationTimeout);
+    if (props.validateFiles) {
+      form.validateFiles();
+    }
+    if (props.withAllErrors ?? config$1.get("form.withAllErrors")) {
+      form.withAllErrors();
+    }
     const formElement = vueExports.ref();
     const method = vueExports.computed(
       () => isUrlMethodPair(props.action) ? props.action.method : props.method.toLowerCase()
@@ -731,26 +892,47 @@ vueExports.defineComponent({
     const isDirty = vueExports.ref(false);
     const defaultData = vueExports.ref(new FormData());
     const onFormUpdate = (event) => {
+      var _a;
+      if (event.type === "reset" && ((_a = event.detail) == null ? void 0 : _a[FormComponentResetSymbol])) {
+        event.preventDefault();
+      }
       isDirty.value = event.type === "reset" ? false : !isEqual(getData(), formDataToObject(defaultData.value));
     };
     const formEvents = ["input", "change", "reset"];
     vueExports.onMounted(() => {
       defaultData.value = getFormData();
+      form.defaults(getData());
       formEvents.forEach((e2) => formElement.value.addEventListener(e2, onFormUpdate));
     });
+    vueExports.watch(
+      () => props.validateFiles,
+      (value) => value ? form.validateFiles() : form.withoutFileValidation()
+    );
+    vueExports.watch(
+      () => props.validationTimeout,
+      (value) => form.setValidationTimeout(value)
+    );
     vueExports.onBeforeUnmount(() => formEvents.forEach((e2) => {
       var _a;
       return (_a = formElement.value) == null ? void 0 : _a.removeEventListener(e2, onFormUpdate);
     }));
-    const getFormData = () => new FormData(formElement.value);
-    const getData = () => formDataToObject(getFormData());
-    const submit = () => {
-      const [action, data] = mergeDataIntoQueryString(
+    const getFormData = (submitter) => new FormData(formElement.value, submitter);
+    const getData = (submitter) => formDataToObject(getFormData(submitter));
+    const getUrlAndData = (submitter) => {
+      return mergeDataIntoQueryString(
         method.value,
         isUrlMethodPair(props.action) ? props.action.url : props.action,
-        getData(),
+        getData(submitter),
         props.queryStringArrayFormat
       );
+    };
+    const submit = (submitter) => {
+      const [url, data] = getUrlAndData(submitter);
+      const formTarget = submitter == null ? void 0 : submitter.getAttribute("formtarget");
+      if (formTarget === "_blank" && method.value === "get") {
+        window.open(url, "_blank");
+        return;
+      }
       const maybeReset = (resetOption) => {
         if (!resetOption) {
           return;
@@ -789,13 +971,18 @@ vueExports.defineComponent({
         },
         ...props.options
       };
-      form.transform(() => props.transform(data)).submit(method.value, action, submitOptions);
+      form.transform(() => props.transform(data)).submit(method.value, url, submitOptions);
+      form.transform(getTransformedData);
     };
     const reset = (...fields) => {
       resetFormFields(formElement.value, defaultData.value, fields);
+      form.reset(...fields);
+    };
+    const clearErrors = (...fields) => {
+      form.clearErrors(...fields);
     };
     const resetAndClearErrors = (...fields) => {
-      form.clearErrors(...fields);
+      clearErrors(...fields);
       reset(...fields);
     };
     const defaults = () => {
@@ -821,7 +1008,10 @@ vueExports.defineComponent({
       get recentlySuccessful() {
         return form.recentlySuccessful;
       },
-      clearErrors: (...fields) => form.clearErrors(...fields),
+      get validating() {
+        return form.validating;
+      },
+      clearErrors,
       resetAndClearErrors,
       setError: (fieldOrFields, maybeValue) => form.setError(typeof fieldOrFields === "string" ? { [fieldOrFields]: maybeValue } : fieldOrFields),
       get isDirty() {
@@ -831,9 +1021,17 @@ vueExports.defineComponent({
       submit,
       defaults,
       getData,
-      getFormData
+      getFormData,
+      // Precognition
+      touch: form.touch,
+      valid: form.valid,
+      invalid: form.invalid,
+      touched: form.touched,
+      validate: (field, config3) => form.validate(...UseFormUtils.mergeHeadersForValidation(field, config3, props.headers)),
+      validator: () => form.validator()
     };
     expose(exposed);
+    vueExports.provide(FormContextKey, exposed);
     return () => {
       return vueExports.h(
         "form",
@@ -844,7 +1042,7 @@ vueExports.defineComponent({
           method: method.value,
           onSubmit: (event) => {
             event.preventDefault();
-            submit();
+            submit(event.submitter);
           },
           inert: props.disableWhileProcessing && form.processing
         },
@@ -1064,6 +1262,13 @@ vueExports.defineComponent({
     const loadingPrevious = vueExports.ref(false);
     const loadingNext = vueExports.ref(false);
     const requestCount = vueExports.ref(0);
+    const hasPreviousPage = vueExports.ref(false);
+    const hasNextPage = vueExports.ref(false);
+    const syncStateFromDataManager = () => {
+      requestCount.value = dataManager.getRequestCount();
+      hasPreviousPage.value = dataManager.hasPrevious();
+      hasNextPage.value = dataManager.hasNext();
+    };
     const {
       dataManager,
       elementManager,
@@ -1085,15 +1290,16 @@ vueExports.defineComponent({
       onBeforePreviousRequest: () => loadingPrevious.value = true,
       onBeforeNextRequest: () => loadingNext.value = true,
       onCompletePreviousRequest: () => {
-        requestCount.value = dataManager.getRequestCount();
         loadingPrevious.value = false;
+        syncStateFromDataManager();
       },
       onCompleteNextRequest: () => {
-        requestCount.value = dataManager.getRequestCount();
         loadingNext.value = false;
-      }
+        syncStateFromDataManager();
+      },
+      onDataReset: syncStateFromDataManager
     });
-    requestCount.value = dataManager.getRequestCount();
+    syncStateFromDataManager();
     const autoLoad = vueExports.computed(() => !manualMode.value);
     const manualMode = vueExports.computed(
       () => props.manual || props.manualAfter > 0 && requestCount.value >= props.manualAfter
@@ -1141,8 +1347,8 @@ vueExports.defineComponent({
       const sharedExposed = {
         loadingPrevious: loadingPrevious.value,
         loadingNext: loadingNext.value,
-        hasPrevious: dataManager.hasPrevious(),
-        hasNext: dataManager.hasNext()
+        hasPrevious: hasPreviousPage.value,
+        hasNext: hasNextPage.value
       };
       if (!props.startElement) {
         const headerAutoMode = autoLoad.value && !props.onlyNext;
@@ -1151,7 +1357,7 @@ vueExports.defineComponent({
           fetch: dataManager.fetchPrevious,
           autoMode: headerAutoMode,
           manualMode: !headerAutoMode,
-          hasMore: dataManager.hasPrevious(),
+          hasMore: hasPreviousPage.value,
           ...sharedExposed
         };
         renderElements.push(
@@ -1180,7 +1386,7 @@ vueExports.defineComponent({
           fetch: dataManager.fetchNext,
           autoMode: footerAutoMode,
           manualMode: !footerAutoMode,
-          hasMore: dataManager.hasNext(),
+          hasMore: hasNextPage.value,
           ...sharedExposed
         };
         renderElements.push(
@@ -1490,6 +1696,7 @@ var Link = vueExports.defineComponent({
 var link_default = Link;
 var whenVisible_default = vueExports.defineComponent({
   name: "WhenVisible",
+  slots: Object,
   props: {
     data: {
       type: [String, Array]
@@ -1521,22 +1728,24 @@ var whenVisible_default = vueExports.defineComponent({
     var _a;
     (_a = this.observer) == null ? void 0 : _a.disconnect();
   },
+  computed: {
+    keys() {
+      return this.data ? Array.isArray(this.data) ? this.data : [this.data] : [];
+    }
+  },
   created() {
     const page2 = usePage();
     this.$watch(
+      () => this.keys.map((key2) => page2.props[key2]),
       () => {
-        return Array.isArray(this.data) ? this.data.map((data) => page2.props[data]) : page2.props[this.data];
-      },
-      (value) => {
-        if (Array.isArray(this.data)) {
-          if (this.data.every((data) => page2.props[data] !== void 0)) {
-            return;
-          }
-        } else if (value !== void 0) {
+        const exists = this.keys.length > 0 && this.keys.every((key2) => page2.props[key2] !== void 0);
+        this.loaded = exists;
+        if (exists && !this.always) {
           return;
         }
-        this.loaded = false;
-        this.$nextTick(this.registerObserver);
+        if (!this.observer || !exists) {
+          this.$nextTick(this.registerObserver);
+        }
       },
       { immediate: true }
     );
@@ -1583,15 +1792,11 @@ var whenVisible_default = vueExports.defineComponent({
       this.observer.observe(this.$el.nextSibling);
     },
     getReloadParams() {
+      const reloadParams = { ...this.$props.params };
       if (this.$props.data) {
-        return {
-          only: Array.isArray(this.$props.data) ? this.$props.data : [this.$props.data]
-        };
+        reloadParams.only = Array.isArray(this.$props.data) ? this.$props.data : [this.$props.data];
       }
-      if (!this.$props.params) {
-        throw new Error("You must provide either a `data` or `params` prop.");
-      }
-      return this.$props.params;
+      return reloadParams;
     }
   },
   render() {
@@ -1600,9 +1805,9 @@ var whenVisible_default = vueExports.defineComponent({
       els.push(vueExports.h(this.$props.as));
     }
     if (!this.loaded) {
-      els.push(this.$slots.fallback ? this.$slots.fallback() : null);
+      els.push(this.$slots.fallback ? this.$slots.fallback({}) : null);
     } else if (this.$slots.default) {
-      els.push(this.$slots.default());
+      els.push(this.$slots.default({ fetching: this.fetching }));
     }
     return els;
   }
@@ -1610,7 +1815,7 @@ var whenVisible_default = vueExports.defineComponent({
 var config = config$1.extend({});
 var serverRenderer_cjs_prod = {};
 /**
-* @vue/server-renderer v3.5.25
+* @vue/server-renderer v3.5.28
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
 **/
@@ -1638,17 +1843,17 @@ function requireServerRenderer_cjs_prod() {
   );
   function ssrRenderAttrs(props, tag) {
     let ret = "";
-    for (const key2 in props) {
-      if (shouldIgnoreProp(key2) || shared.isOn(key2) || tag === "textarea" && key2 === "value") {
+    for (let key2 in props) {
+      if (shouldIgnoreProp(key2) || shared.isOn(key2) || tag === "textarea" && key2 === "value" || // force as property (not rendered in SSR)
+      key2.startsWith(".")) {
         continue;
       }
       const value = props[key2];
-      if (key2 === "class") {
+      if (key2.startsWith("^")) key2 = key2.slice(1);
+      if (key2 === "class" || key2 === "className") {
         ret += ` class="${ssrRenderClass(value)}"`;
       } else if (key2 === "style") {
         ret += ` style="${ssrRenderStyle(value)}"`;
-      } else if (key2 === "className") {
-        ret += ` class="${String(value)}"`;
       } else {
         ret += ssrRenderDynamicAttr(key2, value, tag);
       }
@@ -2844,13 +3049,13 @@ function D(t3, e2, o2, n2) {
   const r2 = new A(t3, e2, o2, n2);
   return t3 ? r2.toString() : r2;
 }
-const appName = "Assocation";
+const appName = "Matos";
 createServer(
   (page2) => createInertiaApp({
     page: page2,
     render: serverRenderer_cjs_prodExports.renderToString,
     title: (title) => `${title} - ${appName}`,
-    resolve: (name) => resolvePageComponent(`./pages/${name}.vue`, /* @__PURE__ */ Object.assign({ "./pages/Admin/Categories/Create.vue": () => import("./assets/Create-B7fEiSEQ.js"), "./pages/Admin/Categories/Edit.vue": () => import("./assets/Edit-DbySJuC_.js"), "./pages/Admin/Categories/Index.vue": () => import("./assets/Index-BTdD1hgs.js"), "./pages/Admin/Dashboard.vue": () => import("./assets/Dashboard-JQ7t_YlY.js"), "./pages/Admin/Users/Create.vue": () => import("./assets/Create-DAJPcMC1.js"), "./pages/Admin/Users/Edit.vue": () => import("./assets/Edit-BtVZWdVs.js"), "./pages/Admin/Users/Index.vue": () => import("./assets/Index-CU8LijQB.js"), "./pages/App/Dashboard.vue": () => import("./assets/Dashboard-YivcUFUA.js"), "./pages/App/Organizations/Calendar/Index.vue": () => import("./assets/Index-3H9qfyGJ.js"), "./pages/App/Organizations/Create.vue": () => import("./assets/Create-D6I1JE_p.js"), "./pages/App/Organizations/Equipments/Create.vue": () => import("./assets/Create-DFQ4oATK.js"), "./pages/App/Organizations/Equipments/Edit.vue": () => import("./assets/Edit-Ch5p37fv.js"), "./pages/App/Organizations/Equipments/Index.vue": () => import("./assets/Index-CEvnIapS.js"), "./pages/App/Organizations/Index.vue": () => import("./assets/Index-BHBwdOf1.js"), "./pages/App/Organizations/Reservations/In/Edit.vue": () => import("./assets/Edit-CbBybw_U.js"), "./pages/App/Organizations/Reservations/In/Index.vue": () => import("./assets/Index-BULACLwa.js"), "./pages/App/Organizations/Reservations/Layout.vue": () => import("./assets/Layout-BLKxRJuX.js"), "./pages/App/Organizations/Reservations/Out/Create.vue": () => import("./assets/Create-B9tRG0iv.js"), "./pages/App/Organizations/Reservations/Out/Edit.vue": () => import("./assets/Edit-DLIhQttR.js"), "./pages/App/Organizations/Reservations/Out/Index.vue": () => import("./assets/Index-DNhwe09-.js"), "./pages/App/Organizations/Settings/Depots/Create.vue": () => import("./assets/Create-CtfusSMW.js"), "./pages/App/Organizations/Settings/Depots/Edit.vue": () => import("./assets/Edit-DcmkQe7q.js"), "./pages/App/Organizations/Settings/Depots/Index.vue": () => import("./assets/Index-BTCm6ZSq.js"), "./pages/App/Organizations/Settings/Edit.vue": () => import("./assets/Edit-DS0rMOLh.js"), "./pages/App/Organizations/Settings/Members/Index.vue": () => import("./assets/Index-oq-_CHsc.js"), "./pages/App/Organizations/Settings/Partials/DeleteOrganization.vue": () => import("./assets/DeleteOrganization-TMcpj1az.js"), "./pages/App/Organizations/Settings/Partials/DepotsManagement.vue": () => import("./assets/DepotsManagement-Q9hwXrEs.js"), "./pages/App/Organizations/Settings/Partials/GeneralForm.vue": () => import("./assets/GeneralForm-Br6kRtPP.js"), "./pages/App/Organizations/Settings/Partials/MembersManagement.vue": () => import("./assets/MembersManagement-D6aoneiR.js"), "./pages/App/Organizations/Show.vue": () => import("./assets/Show-BMPoTUC8.js"), "./pages/Conditions.vue": () => import("./assets/Conditions-DEsHGQ8f.js"), "./pages/Discover.vue": () => import("./assets/Discover-D95lfaPu.js"), "./pages/Faq.vue": () => import("./assets/Faq-4ISUo4s2.js"), "./pages/HowItWorks.vue": () => import("./assets/HowItWorks-_PnId1PC.js"), "./pages/Privacy.vue": () => import("./assets/Privacy-Bg7Y4cCu.js"), "./pages/Public/Carts/Show.vue": () => import("./assets/Show-Zs1pINB8.js"), "./pages/Public/Checkout/Index.vue": () => import("./assets/Index-CKpzO3kn.js"), "./pages/Public/Checkout/Success.vue": () => import("./assets/Success-CFtlqnfV.js"), "./pages/Public/Equipments/Show.vue": () => import("./assets/Show-CgSBudvW.js"), "./pages/Public/Home.vue": () => import("./assets/Home-C__vyWWC.js"), "./pages/Terms.vue": () => import("./assets/Terms-IDEvcgyc.js"), "./pages/auth/ConfirmPassword.vue": () => import("./assets/ConfirmPassword-Ccex6xI1.js"), "./pages/auth/ForgotPassword.vue": () => import("./assets/ForgotPassword-BZUxRCT_.js"), "./pages/auth/Login.vue": () => import("./assets/Login-CCwHhx2F.js"), "./pages/auth/Register.vue": () => import("./assets/Register-DRPHtxwU.js"), "./pages/auth/ResetPassword.vue": () => import("./assets/ResetPassword-CGCbfEsy.js"), "./pages/auth/VerifyEmail.vue": () => import("./assets/VerifyEmail-B9uMQ9OB.js"), "./pages/settings/Appearance.vue": () => import("./assets/Appearance-CLEq4tQ4.js"), "./pages/settings/Password.vue": () => import("./assets/Password-C6NDwvfP.js"), "./pages/settings/Profile.vue": () => import("./assets/Profile-BKYYrYwD.js") })),
+    resolve: (name) => resolvePageComponent(`./pages/${name}.vue`, /* @__PURE__ */ Object.assign({ "./pages/Admin/Categories/Create.vue": () => import("./assets/Create-CtB7flXU.js"), "./pages/Admin/Categories/Edit.vue": () => import("./assets/Edit-D_zQuYz6.js"), "./pages/Admin/Categories/Index.vue": () => import("./assets/Index-Cd2qOFJ9.js"), "./pages/Admin/Dashboard.vue": () => import("./assets/Dashboard-Ca3q7nKZ.js"), "./pages/Admin/Users/Create.vue": () => import("./assets/Create-B0ePyMki.js"), "./pages/Admin/Users/Edit.vue": () => import("./assets/Edit-T7JzkSRw.js"), "./pages/Admin/Users/Index.vue": () => import("./assets/Index-CQyM04FC.js"), "./pages/App/Dashboard.vue": () => import("./assets/Dashboard-B5dTRcu6.js"), "./pages/App/Organizations/Calendar/Index.vue": () => import("./assets/Index-Ch4S_17m.js"), "./pages/App/Organizations/Create.vue": () => import("./assets/Create-Df0chYLu.js"), "./pages/App/Organizations/Equipments/Create.vue": () => import("./assets/Create-Bt0yfUx9.js"), "./pages/App/Organizations/Equipments/Edit.vue": () => import("./assets/Edit-9262o__X.js"), "./pages/App/Organizations/Equipments/Index.vue": () => import("./assets/Index-DNNGxeB5.js"), "./pages/App/Organizations/Index.vue": () => import("./assets/Index-C3zXaNTd.js"), "./pages/App/Organizations/Reservations/In/Edit.vue": () => import("./assets/Edit-C2p5HhyE.js"), "./pages/App/Organizations/Reservations/In/Index.vue": () => import("./assets/Index-CfoAoZsp.js"), "./pages/App/Organizations/Reservations/Layout.vue": () => import("./assets/Layout-CsiAtby1.js"), "./pages/App/Organizations/Reservations/Out/Create.vue": () => import("./assets/Create-DcNd-Wfi.js"), "./pages/App/Organizations/Reservations/Out/Edit.vue": () => import("./assets/Edit-CarN3cOv.js"), "./pages/App/Organizations/Reservations/Out/Index.vue": () => import("./assets/Index-CG1qy5Ac.js"), "./pages/App/Organizations/Settings/Depots/Create.vue": () => import("./assets/Create-CJ-2tkpm.js"), "./pages/App/Organizations/Settings/Depots/Edit.vue": () => import("./assets/Edit-EmjQ-dGJ.js"), "./pages/App/Organizations/Settings/Depots/Index.vue": () => import("./assets/Index-Brba8dLW.js"), "./pages/App/Organizations/Settings/Edit.vue": () => import("./assets/Edit-2-AZ65_h.js"), "./pages/App/Organizations/Settings/Members/Index.vue": () => import("./assets/Index-DljbkHfC.js"), "./pages/App/Organizations/Settings/Partials/DeleteOrganization.vue": () => import("./assets/DeleteOrganization-PQ4WDaob.js"), "./pages/App/Organizations/Settings/Partials/DepotsManagement.vue": () => import("./assets/DepotsManagement-0RpW0z54.js"), "./pages/App/Organizations/Settings/Partials/GeneralForm.vue": () => import("./assets/GeneralForm-fQm7P6qQ.js"), "./pages/App/Organizations/Settings/Partials/MembersManagement.vue": () => import("./assets/MembersManagement-BDZKcLWg.js"), "./pages/App/Organizations/Show.vue": () => import("./assets/Show-sjFQrEzN.js"), "./pages/Conditions.vue": () => import("./assets/Conditions-D_EBDzfB.js"), "./pages/Discover.vue": () => import("./assets/Discover-DKJtLTht.js"), "./pages/Faq.vue": () => import("./assets/Faq-CDh2Ere5.js"), "./pages/HowItWorks.vue": () => import("./assets/HowItWorks-BjdnZ9TI.js"), "./pages/Privacy.vue": () => import("./assets/Privacy-DlP2VZzd.js"), "./pages/Public/Carts/Show.vue": () => import("./assets/Show-Dkw4Bv3L.js"), "./pages/Public/Checkout/Index.vue": () => import("./assets/Index-l3ofRiiW.js"), "./pages/Public/Checkout/Success.vue": () => import("./assets/Success-TUGTqp3X.js"), "./pages/Public/Equipments/Show.vue": () => import("./assets/Show-B48avIxT.js"), "./pages/Public/Home.vue": () => import("./assets/Home-C1g8cw-x.js"), "./pages/Terms.vue": () => import("./assets/Terms-DrXIMjlM.js"), "./pages/auth/ConfirmPassword.vue": () => import("./assets/ConfirmPassword-CTTYcvie.js"), "./pages/auth/ForgotPassword.vue": () => import("./assets/ForgotPassword-Cu1wATob.js"), "./pages/auth/Login.vue": () => import("./assets/Login-1F2BFrpP.js"), "./pages/auth/Register.vue": () => import("./assets/Register-Cli2ozif.js"), "./pages/auth/ResetPassword.vue": () => import("./assets/ResetPassword-nTczaZ7u.js"), "./pages/auth/VerifyEmail.vue": () => import("./assets/VerifyEmail-2FCw1JyI.js"), "./pages/settings/Appearance.vue": () => import("./assets/Appearance-D15ay4dh.js"), "./pages/settings/Password.vue": () => import("./assets/Password-Db44TKnc.js"), "./pages/settings/Profile.vue": () => import("./assets/Profile-D6locUf7.js") })),
     setup({ App: App2, props, plugin: plugin2 }) {
       const app = vueExports.createSSRApp({ render: () => vueExports.h(App2, props) });
       const ziggyConfig = {

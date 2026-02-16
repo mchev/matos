@@ -70,9 +70,8 @@ const navigationItems = computed(() => [
               <span class="text-2xl sm:text-3xl font-bold font-title bg-gradient-to-r from-violet-600 to-violet-400 bg-clip-text text-transparent">
                 Matos
               </span>
-              <span class="text-2xl sm:text-3xl font-bold font-title bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent relative">
+              <span class="text-lg sm:text-xl font-medium font-title text-gray-500 dark:text-gray-400 align-baseline">
                 .live
-                <span class="absolute -bottom-1.5 left-0 w-full h-0.5 bg-gradient-to-r from-violet-400 to-blue-600 rounded-full"></span>
               </span>
             </h1>
           </Link>
