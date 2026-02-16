@@ -6,8 +6,7 @@ import { createSSRApp, h } from 'vue';
 import { route as ziggyRoute } from 'ziggy-js';
 
 const appName = import.meta.env.VITE_APP_NAME || 'matos.live';
-
-const ssrPort = Number(process.env.INERTIA_SSR_PORT) || 13714;
+const inertiaPort = import.meta.env.VITE_INERTIA_SSR_PORT || 13714;
 
 createServer((page) =>
     createInertiaApp({
@@ -40,5 +39,5 @@ createServer((page) =>
             return app;
         },
     }),
-    { port: ssrPort },
+    { port: inertiaPort },
 );

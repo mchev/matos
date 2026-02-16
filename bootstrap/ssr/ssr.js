@@ -3050,7 +3050,7 @@ function D(t3, e2, o2, n2) {
   return t3 ? r2.toString() : r2;
 }
 const appName = "Matos";
-const ssrPort = Number(process.env.INERTIA_SSR_PORT) || 13714;
+const inertiaPort = 13714;
 createServer(
   (page2) => createInertiaApp({
     page: page2,
@@ -3072,7 +3072,7 @@ createServer(
       return app;
     }
   }),
-  { port: ssrPort }
+  { port: inertiaPort }
 );
 export {
   usePage as a,
