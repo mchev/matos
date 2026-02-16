@@ -1,1 +1,0 @@
-import{j as a,g as t,a as n,h as c,t as s,o}from"./app-Cgyqco5e.js";const i={class:"mb-0.5 text-base font-medium"},r={key:0,class:"text-sm text-muted-foreground"},p=a({__name:"HeadingSmall",props:{title:{},description:{}},setup(e){return(m,d)=>(o(),t("header",null,[n("h3",i,s(e.title),1),e.description?(o(),t("p",r,s(e.description),1)):c("",!0)]))}});export{p as _};
