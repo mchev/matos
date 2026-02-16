@@ -6,6 +6,17 @@ import { resolve } from 'node:path';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
+    ssr: {
+        // Bundle only SSR runtime deps so ssr.js stays small. Requires production
+        // node_modules on the server (e.g. deploy node_modules or run npm ci --omit=dev once).
+        noExternal: [
+            '@inertiajs/vue3',
+            '@vue/server-renderer',
+            'laravel-vite-plugin',
+            'ziggy-js',
+            'vue',
+        ],
+    },
     plugins: [
         laravel({
             input: ['resources/js/app.ts'],
