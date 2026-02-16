@@ -25,6 +25,3 @@ Disallow: /node_modules/
 Allow: /
 Allow: /decouvrir
 Allow: /comment-ca-marche
-
-# Crawl delay for respectful crawling
-Crawl-delay: 1
