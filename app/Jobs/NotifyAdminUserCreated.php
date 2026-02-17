@@ -24,9 +24,12 @@ class NotifyAdminUserCreated implements ShouldQueue
      */
     public function handle(): void
     {
-        $admin = User::where('email', config('mail.from.address'))->first();
-        if ($admin) {
-            $admin->notify(new UserCreatedNotification($this->user));
+        // $admin = User::where('email', config('mail.from.address'))->first();
+
+        $administrators = User::where('is_admin', true)->get();
+
+        foreach ($administrators as $administrator) {
+            $administrator->notify(new UserCreatedNotification($this->user));
         }
     }
 }
