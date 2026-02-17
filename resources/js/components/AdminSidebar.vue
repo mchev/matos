@@ -37,6 +37,15 @@
             </Link>
           </SidebarMenuButton>
         </SidebarMenuItem>
+
+        <SidebarMenuItem>
+          <SidebarMenuButton as-child :active="$page.url.startsWith(route('admin.newsletters.index'))">
+            <Link :href="route('admin.newsletters.index')" class="flex items-center gap-2">
+              <Mail class="h-4 w-4" />
+              <span>Newsletters</span>
+            </Link>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
       </SidebarMenu>
     </SidebarContent>
 
@@ -62,6 +71,7 @@ import {
   LayoutDashboard, 
   Users, 
   Tags, 
+  Mail, 
   ArrowLeft 
 } from 'lucide-vue-next'
 import {

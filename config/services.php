@@ -30,6 +30,7 @@ return [
 
     'brevo' => [
         'key' => env('BREVO_API_KEY'),
+        'list_id' => env('BREVO_LIST_ID'),
     ],
 
     'google' => [

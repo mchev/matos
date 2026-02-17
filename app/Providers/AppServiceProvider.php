@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Models\Equipment;
+use App\Models\User;
 use App\Observers\EquipmentObserver;
+use App\Observers\UserObserver;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
@@ -22,8 +24,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Enregistrer l'observer pour les équipements
         Equipment::observe(EquipmentObserver::class);
+        User::observe(UserObserver::class);
 
         Event::listen(function (\SocialiteProviders\Manager\SocialiteWasCalled $event) {
             $event->extendSocialite('google', \SocialiteProviders\Google\Provider::class);
