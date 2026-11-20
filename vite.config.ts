@@ -1,9 +1,11 @@
 import vue from '@vitejs/plugin-vue';
 import laravel from 'laravel-vite-plugin';
-import path from 'path';
-import tailwindcss from "@tailwindcss/vite";
-import { resolve } from 'node:path';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vite';
+
+const rootDir = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
     ssr: {
@@ -35,8 +37,8 @@ export default defineConfig({
     ],
     resolve: {
         alias: {
-            '@': path.resolve(__dirname, './resources/js'),
-            'ziggy-js': resolve(__dirname, 'vendor/tightenco/ziggy'),
+            '@': path.resolve(rootDir, './resources/js'),
+            'ziggy-js': path.resolve(rootDir, 'vendor/tightenco/ziggy'),
         },
     },
 });

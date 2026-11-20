@@ -1,3085 +1,3044 @@
-import { createHeadManager, router, config as config$1, isUrlMethodPair, formDataToObject, mergeDataIntoQueryString, getScrollableParent, useInfiniteScroll, UseFormUtils, FormComponentResetSymbol, resetFormFields, shouldIntercept, shouldNavigate, getInitialPageFromDOM, setupProgress } from "@inertiajs/core";
-import require$$0 from "@vue/compiler-dom";
-import require$$1 from "@vue/runtime-dom";
-import require$$2 from "@vue/shared";
-import { escape as escape$1, cloneDeep, has, set, get, isEqual } from "lodash-es";
-import { createValidator, toSimpleValidationErrors, resolveName } from "laravel-precognition";
-import createServer from "@inertiajs/core/server";
-import require$$2$1 from "@vue/compiler-ssr";
-import require$$3 from "node:stream";
-var vue = { exports: {} };
-var vue_cjs_prod = {};
-/**
-* vue v3.5.28
-* (c) 2018-present Yuxi (Evan) You and Vue contributors
-* @license MIT
-**/
-var hasRequiredVue_cjs_prod;
-function requireVue_cjs_prod() {
-  if (hasRequiredVue_cjs_prod) return vue_cjs_prod;
-  hasRequiredVue_cjs_prod = 1;
-  (function(exports$1) {
-    Object.defineProperty(exports$1, "__esModule", { value: true });
-    var compilerDom = require$$0;
-    var runtimeDom = require$$1;
-    var shared = require$$2;
-    function _interopNamespaceDefault(e2) {
-      var n2 = /* @__PURE__ */ Object.create(null);
-      if (e2) {
-        for (var k in e2) {
-          n2[k] = e2[k];
-        }
-      }
-      n2.default = e2;
-      return Object.freeze(n2);
-    }
-    var runtimeDom__namespace = /* @__PURE__ */ _interopNamespaceDefault(runtimeDom);
-    const compileCache = /* @__PURE__ */ Object.create(null);
-    function compileToFunction(template, options) {
-      if (!shared.isString(template)) {
-        if (template.nodeType) {
-          template = template.innerHTML;
-        } else {
-          return shared.NOOP;
-        }
-      }
-      const key2 = shared.genCacheKey(template, options);
-      const cached = compileCache[key2];
-      if (cached) {
-        return cached;
-      }
-      if (template[0] === "#") {
-        const el = document.querySelector(template);
-        template = el ? el.innerHTML : ``;
-      }
-      const opts = shared.extend(
-        {
-          hoistStatic: true,
-          onError: void 0,
-          onWarn: shared.NOOP
-        },
-        options
-      );
-      if (!opts.isCustomElement && typeof customElements !== "undefined") {
-        opts.isCustomElement = (tag) => !!customElements.get(tag);
-      }
-      const { code } = compilerDom.compile(template, opts);
-      const render = new Function("Vue", code)(runtimeDom__namespace);
-      render._rc = true;
-      return compileCache[key2] = render;
-    }
-    runtimeDom.registerRuntimeCompiler(compileToFunction);
-    exports$1.compile = compileToFunction;
-    Object.keys(runtimeDom).forEach(function(k) {
-      if (k !== "default" && !Object.prototype.hasOwnProperty.call(exports$1, k)) exports$1[k] = runtimeDom[k];
-    });
-  })(vue_cjs_prod);
-  return vue_cjs_prod;
-}
-var vue_cjs = {};
-/**
-* vue v3.5.28
-* (c) 2018-present Yuxi (Evan) You and Vue contributors
-* @license MIT
-**/
-var hasRequiredVue_cjs;
-function requireVue_cjs() {
-  if (hasRequiredVue_cjs) return vue_cjs;
-  hasRequiredVue_cjs = 1;
-  (function(exports$1) {
-    Object.defineProperty(exports$1, "__esModule", { value: true });
-    var compilerDom = require$$0;
-    var runtimeDom = require$$1;
-    var shared = require$$2;
-    function _interopNamespaceDefault(e2) {
-      var n2 = /* @__PURE__ */ Object.create(null);
-      if (e2) {
-        for (var k in e2) {
-          n2[k] = e2[k];
-        }
-      }
-      n2.default = e2;
-      return Object.freeze(n2);
-    }
-    var runtimeDom__namespace = /* @__PURE__ */ _interopNamespaceDefault(runtimeDom);
-    const compileCache = /* @__PURE__ */ Object.create(null);
-    function compileToFunction(template, options) {
-      if (!shared.isString(template)) {
-        if (template.nodeType) {
-          template = template.innerHTML;
-        } else {
-          runtimeDom.warn(`invalid template option: `, template);
-          return shared.NOOP;
-        }
-      }
-      const key2 = shared.genCacheKey(template, options);
-      const cached = compileCache[key2];
-      if (cached) {
-        return cached;
-      }
-      if (template[0] === "#") {
-        const el = document.querySelector(template);
-        if (!el) {
-          runtimeDom.warn(`Template element not found or is empty: ${template}`);
-        }
-        template = el ? el.innerHTML : ``;
-      }
-      const opts = shared.extend(
-        {
-          hoistStatic: true,
-          onError,
-          onWarn: (e2) => onError(e2, true)
-        },
-        options
-      );
-      if (!opts.isCustomElement && typeof customElements !== "undefined") {
-        opts.isCustomElement = (tag) => !!customElements.get(tag);
-      }
-      const { code } = compilerDom.compile(template, opts);
-      function onError(err, asWarning = false) {
-        const message = asWarning ? err.message : `Template compilation error: ${err.message}`;
-        const codeFrame = err.loc && shared.generateCodeFrame(
-          template,
-          err.loc.start.offset,
-          err.loc.end.offset
-        );
-        runtimeDom.warn(codeFrame ? `${message}
-${codeFrame}` : message);
-      }
-      const render = new Function("Vue", code)(runtimeDom__namespace);
-      render._rc = true;
-      return compileCache[key2] = render;
-    }
-    runtimeDom.registerRuntimeCompiler(compileToFunction);
-    exports$1.compile = compileToFunction;
-    Object.keys(runtimeDom).forEach(function(k) {
-      if (k !== "default" && !Object.prototype.hasOwnProperty.call(exports$1, k)) exports$1[k] = runtimeDom[k];
-    });
-  })(vue_cjs);
-  return vue_cjs;
-}
-var hasRequiredVue;
-function requireVue() {
-  if (hasRequiredVue) return vue.exports;
-  hasRequiredVue = 1;
-  if (process.env.NODE_ENV === "production") {
-    vue.exports = requireVue_cjs_prod();
-  } else {
-    vue.exports = requireVue_cjs();
-  }
-  return vue.exports;
-}
-var vueExports = requireVue();
-var remember = {
-  created() {
-    if (!this.$options.remember) {
-      return;
-    }
-    if (Array.isArray(this.$options.remember)) {
-      this.$options.remember = { data: this.$options.remember };
-    }
-    if (typeof this.$options.remember === "string") {
-      this.$options.remember = { data: [this.$options.remember] };
-    }
-    if (typeof this.$options.remember.data === "string") {
-      this.$options.remember = { data: [this.$options.remember.data] };
-    }
-    const rememberKey = this.$options.remember.key instanceof Function ? this.$options.remember.key.call(this) : this.$options.remember.key;
-    const restored = router.restore(rememberKey);
-    const rememberable = this.$options.remember.data.filter((key2) => {
-      return !(this[key2] !== null && typeof this[key2] === "object" && this[key2].__rememberable === false);
-    });
-    const hasCallbacks = (key2) => {
-      return this[key2] !== null && typeof this[key2] === "object" && typeof this[key2].__remember === "function" && typeof this[key2].__restore === "function";
-    };
-    rememberable.forEach((key2) => {
-      if (this[key2] !== void 0 && restored !== void 0 && restored[key2] !== void 0) {
-        hasCallbacks(key2) ? this[key2].__restore(restored[key2]) : this[key2] = restored[key2];
-      }
-      this.$watch(
-        key2,
-        () => {
-          router.remember(
-            rememberable.reduce(
-              (data, key3) => ({
-                ...data,
-                [key3]: cloneDeep(hasCallbacks(key3) ? this[key3].__remember() : this[key3])
-              }),
-              {}
-            ),
-            rememberKey
-          );
-        },
-        { immediate: true, deep: true }
-      );
-    });
-  }
+import { createRequire } from "node:module";
+import { FormComponentResetSymbol, UseFormUtils, buildSSRBody, config, configureLive, createHeadManager, createLayoutPropsStore, exposeInterceptors, formDataToObject, getInitialPageFromDOM, getScrollableParent, http, isPropsObject, isPropsObjectOrCallback, isSameUrlWithoutQueryOrHash, isUrlMethodPair, mergeDataIntoQueryString, normalizeLayouts, partialReloadRequestsSomeProps, resetFormFields, resolveServerHead, resolveUrlMethodPairComponent, router, router as router12, setupProgress, shouldIntercept, shouldNavigate, useInfiniteScroll } from "@inertiajs/core";
+import { cloneDeep, isEqual } from "es-toolkit";
+import { escape, get, has, set } from "es-toolkit/compat";
+import { createValidator, resolveName, toSimpleValidationErrors } from "laravel-precognition";
+import server_default from "@inertiajs/core/server";
+// \0rolldown/runtime.js
+var __create = Object.create;
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __commonJSMin = (cb, mod) => () => (mod || (cb((mod = { exports: {} }).exports, mod, mod.exports), cb = null), mod.exports);
+var __exportAll = (all, no_symbols) => {
+	let target = {};
+	for (var name in all) __defProp(target, name, {
+		get: all[name],
+		enumerable: true
+	});
+	if (!no_symbols) __defProp(target, Symbol.toStringTag, { value: "Module" });
+	return target;
 };
-var remember_default = remember;
+var __copyProps = (to, from, except, desc) => {
+	if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+		key = keys[i];
+		if (!__hasOwnProp.call(to, key) && key !== except) __defProp(to, key, {
+			get: ((k) => from[k]).bind(null, key),
+			enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+		});
+	}
+	return to;
+};
+var __reExport = (target, mod, secondTarget) => (__copyProps(target, mod, "default"), secondTarget && __copyProps(secondTarget, mod, "default"));
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule || !__hasOwnProp.call(mod, "default") ? __defProp(target, "default", {
+	value: mod,
+	enumerable: true
+}) : target, mod));
+var __require = /* #__PURE__ */ (() => createRequire(import.meta.url))();
+// node_modules/vue/dist/vue.cjs.prod.js
+/**
+* vue v3.5.46
+* (c) 2018-present Yuxi (Evan) You and Vue contributors
+* @license MIT
+**/
+var require_vue_cjs_prod = /* @__PURE__ */ __commonJSMin(((exports) => {
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var compilerDom = __require("@vue/compiler-dom");
+	var runtimeDom = __require("@vue/runtime-dom");
+	var shared = __require("@vue/shared");
+	function _interopNamespaceDefault(e) {
+		var n = Object.create(null);
+		if (e) for (var k in e) n[k] = e[k];
+		n.default = e;
+		return Object.freeze(n);
+	}
+	var runtimeDom__namespace = /*#__PURE__*/ _interopNamespaceDefault(runtimeDom);
+	var compileCache = /* @__PURE__ */ Object.create(null);
+	function compileToFunction(template, options) {
+		if (!shared.isString(template)) {
+			if (template.nodeType) template = template.innerHTML;
+			else return shared.NOOP;
+		}
+		const key = shared.genCacheKey(template, options);
+		const cached = compileCache[key];
+		if (cached) return cached;
+		if (template[0] === "#") {
+			const el = document.querySelector(template);
+			template = el ? el.innerHTML : ``;
+		}
+		const opts = shared.extend({
+			hoistStatic: true,
+			onError: void 0,
+			onWarn: shared.NOOP
+		}, options);
+		if (!opts.isCustomElement && typeof customElements !== "undefined") opts.isCustomElement = (tag) => !!customElements.get(tag);
+		const { code } = compilerDom.compile(template, opts);
+		const render = new Function("Vue", code)(runtimeDom__namespace);
+		render._rc = true;
+		return compileCache[key] = render;
+	}
+	runtimeDom.registerRuntimeCompiler(compileToFunction);
+	exports.compile = compileToFunction;
+	Object.keys(runtimeDom).forEach(function(k) {
+		if (k !== "default" && !Object.prototype.hasOwnProperty.call(exports, k)) exports[k] = runtimeDom[k];
+	});
+}));
+// node_modules/vue/dist/vue.cjs.js
+/**
+* vue v3.5.46
+* (c) 2018-present Yuxi (Evan) You and Vue contributors
+* @license MIT
+**/
+var require_vue_cjs = /* @__PURE__ */ __commonJSMin(((exports) => {
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var compilerDom = __require("@vue/compiler-dom");
+	var runtimeDom = __require("@vue/runtime-dom");
+	var shared = __require("@vue/shared");
+	function _interopNamespaceDefault(e) {
+		var n = Object.create(null);
+		if (e) for (var k in e) n[k] = e[k];
+		n.default = e;
+		return Object.freeze(n);
+	}
+	var runtimeDom__namespace = /*#__PURE__*/ _interopNamespaceDefault(runtimeDom);
+	var compileCache = /* @__PURE__ */ Object.create(null);
+	function compileToFunction(template, options) {
+		if (!shared.isString(template)) {
+			if (template.nodeType) template = template.innerHTML;
+			else {
+				runtimeDom.warn(`invalid template option: `, template);
+				return shared.NOOP;
+			}
+		}
+		const key = shared.genCacheKey(template, options);
+		const cached = compileCache[key];
+		if (cached) return cached;
+		if (template[0] === "#") {
+			const el = document.querySelector(template);
+			if (!el) runtimeDom.warn(`Template element not found or is empty: ${template}`);
+			template = el ? el.innerHTML : ``;
+		}
+		const opts = shared.extend({
+			hoistStatic: true,
+			onError,
+			onWarn: (e) => onError(e, true)
+		}, options);
+		if (!opts.isCustomElement && typeof customElements !== "undefined") opts.isCustomElement = (tag) => !!customElements.get(tag);
+		const { code } = compilerDom.compile(template, opts);
+		function onError(err, asWarning = false) {
+			const message = asWarning ? err.message : `Template compilation error: ${err.message}`;
+			const codeFrame = err.loc && shared.generateCodeFrame(template, err.loc.start.offset, err.loc.end.offset);
+			runtimeDom.warn(codeFrame ? `${message}
+${codeFrame}` : message);
+		}
+		const render = new Function("Vue", code)(runtimeDom__namespace);
+		render._rc = true;
+		return compileCache[key] = render;
+	}
+	runtimeDom.registerRuntimeCompiler(compileToFunction);
+	exports.compile = compileToFunction;
+	Object.keys(runtimeDom).forEach(function(k) {
+		if (k !== "default" && !Object.prototype.hasOwnProperty.call(exports, k)) exports[k] = runtimeDom[k];
+	});
+}));
+// node_modules/vue/index.js
+var require_vue = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	if (process.env.NODE_ENV === "production") module.exports = require_vue_cjs_prod();
+	else module.exports = require_vue_cjs();
+}));
+// node_modules/vue/index.mjs
+var vue_exports = /* @__PURE__ */ __exportAll({});
+__reExport(vue_exports, /* @__PURE__ */ __toESM(require_vue(), 1));
+// node_modules/@inertiajs/vue3/dist/index.js
+var HydrationContextKey = /* @__PURE__ */ Symbol("InertiaHydrationContext");
+function provideHydrationContext(hydrated) {
+	(0, vue_exports.provide)(HydrationContextKey, hydrated);
+}
+function injectHydrationContext() {
+	return (0, vue_exports.inject)(HydrationContextKey, null);
+}
+var store = createLayoutPropsStore();
+var state = (0, vue_exports.ref)(store.get());
+store.subscribe(() => {
+	state.value = store.get();
+});
+function resetLayoutProps() {
+	store.reset();
+	state.value = store.get();
+}
+var remember_default = { created() {
+	if (!this.$options.remember) return;
+	if (Array.isArray(this.$options.remember)) this.$options.remember = { data: this.$options.remember };
+	if (typeof this.$options.remember === "string") this.$options.remember = { data: [this.$options.remember] };
+	if (typeof this.$options.remember.data === "string") this.$options.remember = { data: [this.$options.remember.data] };
+	const rememberKey = this.$options.remember.key instanceof Function ? this.$options.remember.key.call(this) : this.$options.remember.key;
+	const restored = router.restore(rememberKey);
+	const rememberable = this.$options.remember.data.filter((key2) => {
+		return !(this[key2] !== null && typeof this[key2] === "object" && this[key2].__rememberable === false);
+	});
+	const hasCallbacks = (key2) => {
+		return this[key2] !== null && typeof this[key2] === "object" && typeof this[key2].__remember === "function" && typeof this[key2].__restore === "function";
+	};
+	rememberable.forEach((key2) => {
+		if (this[key2] !== void 0 && restored !== void 0 && restored[key2] !== void 0) hasCallbacks(key2) ? this[key2].__restore(restored[key2]) : this[key2] = restored[key2];
+		this.$watch(key2, () => {
+			router.remember(rememberable.reduce((data, key3) => ({
+				...data,
+				[key3]: cloneDeep(hasCallbacks(key3) ? this[key3].__remember() : this[key3])
+			}), {}), rememberKey);
+		}, {
+			immediate: true,
+			deep: true
+		});
+	});
+} };
+function useFormState(options) {
+	const { data: dataOption, rememberKey } = options;
+	let { precognitionEndpoint } = options;
+	const isDataFunction = typeof dataOption === "function";
+	const resolveData = () => isDataFunction ? dataOption() : dataOption;
+	const restored = rememberKey ? router.restore(rememberKey) : null;
+	const initialData = restored?.data ?? cloneDeep(resolveData());
+	let defaults = cloneDeep(initialData);
+	let transform = (data) => data;
+	let validatorRef = null;
+	let withAllErrors = null;
+	const withAllErrorsEnabled = () => withAllErrors ?? config$1.get("form.withAllErrors");
+	let recentlySuccessfulTimeoutId;
+	let defaultsCalledInOnSuccess = false;
+	let rememberExcludeKeys = [];
+	const typedForm = (0, vue_exports.reactive)({
+		...cloneDeep(defaults),
+		isDirty: false,
+		errors: {},
+		hasErrors: false,
+		processing: false,
+		progress: null,
+		wasSuccessful: false,
+		recentlySuccessful: false,
+		withPrecognition(...args) {
+			precognitionEndpoint = UseFormUtils.createWayfinderCallback(...args);
+			const formWithPrecognition = this;
+			const validator = createValidator((client) => {
+				const { method, url } = precognitionEndpoint();
+				const transformedData = cloneDeep(transform(this.data()));
+				return client[method](url, transformedData);
+			}, cloneDeep(defaults));
+			validatorRef = validator;
+			validator.on("validatingChanged", () => {
+				formWithPrecognition.validating = validator.validating();
+			}).on("validatedChanged", () => {
+				formWithPrecognition.__valid = validator.valid();
+			}).on("touchedChanged", () => {
+				formWithPrecognition.__touched = validator.touched();
+			}).on("errorsChanged", () => {
+				const validationErrors = withAllErrorsEnabled() ? validator.errors() : toSimpleValidationErrors(validator.errors());
+				this.errors = {};
+				this.setError(validationErrors);
+				formWithPrecognition.__valid = validator.valid();
+			});
+			const tap = (value, callback) => {
+				callback(value);
+				return value;
+			};
+			Object.assign(formWithPrecognition, {
+				__touched: [],
+				__valid: [],
+				validating: false,
+				validator: () => validator,
+				withAllErrors: () => tap(formWithPrecognition, () => withAllErrors = true),
+				valid: (field) => formWithPrecognition.__valid.includes(field),
+				invalid: (field) => field in this.errors,
+				setValidationTimeout: (duration) => tap(formWithPrecognition, () => validator.setTimeout(duration)),
+				validateFiles: () => tap(formWithPrecognition, () => validator.validateFiles()),
+				withoutFileValidation: () => tap(formWithPrecognition, () => validator.withoutFileValidation()),
+				touch: (field, ...fields) => {
+					if (Array.isArray(field)) validator.touch(field);
+					else if (typeof field === "string") validator.touch([field, ...fields]);
+					else validator.touch(field);
+					return formWithPrecognition;
+				},
+				touched: (field) => typeof field === "string" ? formWithPrecognition.__touched.includes(field) : formWithPrecognition.__touched.length > 0,
+				validate: (field, config4) => {
+					if (typeof field === "object" && !("target" in field)) {
+						config4 = field;
+						field = void 0;
+					}
+					if (field === void 0) validator.validate(config4);
+					else {
+						const fieldName = resolveName(field);
+						const transformedData = transform(this.data());
+						validator.validate(fieldName, get(transformedData, fieldName), config4);
+					}
+					return formWithPrecognition;
+				},
+				setErrors: (errors) => tap(formWithPrecognition, () => this.setError(errors)),
+				forgetError: (field) => tap(formWithPrecognition, () => this.clearErrors(resolveName(field)))
+			});
+			return formWithPrecognition;
+		},
+		data() {
+			return Object.keys(defaults).reduce((carry, key2) => {
+				return set(carry, key2, get(this, key2));
+			}, {});
+		},
+		transform(callback) {
+			transform = callback;
+			return this;
+		},
+		defaults(fieldOrFields, maybeValue) {
+			if (isDataFunction) throw new Error("You cannot call `defaults()` when using a function to define your form data.");
+			defaultsCalledInOnSuccess = true;
+			if (typeof fieldOrFields === "undefined") {
+				defaults = cloneDeep(this.data());
+				this.isDirty = false;
+			} else defaults = typeof fieldOrFields === "string" ? set(cloneDeep(defaults), fieldOrFields, maybeValue) : Object.assign({}, cloneDeep(defaults), fieldOrFields);
+			validatorRef?.defaults(defaults);
+			return this;
+		},
+		reset(...fields) {
+			const resolvedData = isDataFunction ? cloneDeep(resolveData()) : defaults;
+			const clonedData = cloneDeep(resolvedData);
+			if (fields.length === 0) {
+				if (isDataFunction) defaults = clonedData;
+				Object.assign(this, clonedData);
+			} else fields.filter((key2) => has(clonedData, key2)).forEach((key2) => {
+				if (isDataFunction) set(defaults, key2, get(clonedData, key2));
+				set(this, key2, get(clonedData, key2));
+			});
+			validatorRef?.reset(...fields);
+			return this;
+		},
+		setError(fieldOrFields, maybeValue) {
+			const errors = typeof fieldOrFields === "string" ? { [fieldOrFields]: maybeValue } : fieldOrFields;
+			Object.assign(this.errors, errors);
+			this.hasErrors = Object.keys(this.errors).length > 0;
+			validatorRef?.setErrors(errors);
+			return this;
+		},
+		clearErrors(...fields) {
+			this.errors = Object.keys(this.errors).reduce((carry, field) => ({
+				...carry,
+				...fields.length > 0 && !fields.includes(field) ? { [field]: this.errors[field] } : {}
+			}), {});
+			this.hasErrors = Object.keys(this.errors).length > 0;
+			if (validatorRef) {
+				if (fields.length === 0) validatorRef.setErrors({});
+				else fields.forEach(validatorRef.forgetError);
+			}
+			return this;
+		},
+		resetAndClearErrors(...fields) {
+			this.reset(...fields);
+			this.clearErrors(...fields);
+			return this;
+		},
+		__rememberable: rememberKey === null,
+		__remember() {
+			const formData = this.data();
+			if (rememberExcludeKeys.length > 0) {
+				const filtered = { ...formData };
+				rememberExcludeKeys.forEach((k) => delete filtered[k]);
+				return {
+					data: filtered,
+					errors: this.errors
+				};
+			}
+			return {
+				data: formData,
+				errors: this.errors
+			};
+		},
+		__restore(restored2) {
+			Object.assign(this, restored2.data);
+			this.setError(restored2.errors);
+		}
+	});
+	if (restored?.errors) typedForm.setError(restored.errors);
+	(0, vue_exports.watch)(typedForm, () => {
+		typedForm.isDirty = !isEqual(typedForm.data(), defaults);
+	}, {
+		immediate: true,
+		deep: true
+	});
+	(0, vue_exports.watch)(typedForm, (newValue) => {
+		if (!rememberKey) return;
+		const storedData = router.restore(rememberKey);
+		const newData = cloneDeep(newValue.__remember());
+		if (!isEqual(storedData, newData)) router.remember(newData, rememberKey);
+	}, {
+		immediate: true,
+		deep: true
+	});
+	if (precognitionEndpoint) typedForm.withPrecognition(precognitionEndpoint);
+	return {
+		form: typedForm,
+		setDefaults: (newDefaults) => {
+			defaults = newDefaults;
+		},
+		getTransform: () => transform,
+		getPrecognitionEndpoint: () => precognitionEndpoint ?? null,
+		markAsSuccessful: () => {
+			typedForm.clearErrors();
+			typedForm.wasSuccessful = true;
+			typedForm.recentlySuccessful = true;
+			recentlySuccessfulTimeoutId = setTimeout(() => typedForm.recentlySuccessful = false, config$1.get("form.recentlySuccessfulDuration"));
+		},
+		wasDefaultsCalledInOnSuccess: () => defaultsCalledInOnSuccess,
+		resetDefaultsCalledInOnSuccess: () => {
+			defaultsCalledInOnSuccess = false;
+		},
+		setRememberExcludeKeys: (keys) => {
+			rememberExcludeKeys = keys;
+		},
+		resetBeforeSubmit: () => {
+			typedForm.wasSuccessful = false;
+			typedForm.recentlySuccessful = false;
+			clearTimeout(recentlySuccessfulTimeoutId);
+		},
+		finishProcessing: () => {
+			typedForm.processing = false;
+			typedForm.progress = null;
+		},
+		withAllErrors: {
+			enabled: withAllErrorsEnabled,
+			enable: () => {
+				withAllErrors = true;
+			}
+		}
+	};
+}
 var reservedFormKeys = null;
 var bootstrapping = false;
 function validateFormDataKeys(data) {
-  if (bootstrapping) {
-    return;
-  }
-  if (reservedFormKeys === null) {
-    bootstrapping = true;
-    reservedFormKeys = new Set(Object.keys(useForm({})));
-    bootstrapping = false;
-  }
-  const conflicts = Object.keys(data).filter((key2) => reservedFormKeys.has(key2));
-  if (conflicts.length > 0) {
-    console.error(
-      `[Inertia] useForm() data contains field(s) that conflict with form properties: ${conflicts.map((k) => `"${k}"`).join(", ")}. These fields will be overwritten by form methods/properties. Please rename these fields.`
-    );
-  }
+	if (bootstrapping) return;
+	if (reservedFormKeys === null) {
+		bootstrapping = true;
+		reservedFormKeys = new Set(Object.keys(useForm({})));
+		bootstrapping = false;
+	}
+	const conflicts = Object.keys(data).filter((key2) => reservedFormKeys.has(key2));
+	if (conflicts.length > 0) console.error(`[Inertia] useForm() data contains field(s) that conflict with form properties: ${conflicts.map((k) => `"${k}"`).join(", ")}. These fields will be overwritten by form methods/properties. Please rename these fields.`);
 }
 function useForm(...args) {
-  let { rememberKey, data, precognitionEndpoint } = UseFormUtils.parseUseFormArguments(...args);
-  const restored = rememberKey ? router.restore(rememberKey) : null;
-  let defaults = typeof data === "function" ? cloneDeep(data()) : cloneDeep(data);
-  validateFormDataKeys(defaults);
-  let cancelToken = null;
-  let recentlySuccessfulTimeoutId;
-  let transform = (data2) => data2;
-  let validatorRef = null;
-  let rememberExcludeKeys = [];
-  let defaultsCalledInOnSuccess = false;
-  const form = vueExports.reactive({
-    ...restored ? restored.data : cloneDeep(defaults),
-    isDirty: false,
-    errors: restored ? restored.errors : {},
-    hasErrors: false,
-    processing: false,
-    progress: null,
-    wasSuccessful: false,
-    recentlySuccessful: false,
-    withPrecognition(...args2) {
-      precognitionEndpoint = UseFormUtils.createWayfinderCallback(...args2);
-      const formWithPrecognition = this;
-      let withAllErrors = null;
-      const validator = createValidator((client) => {
-        const { method, url } = precognitionEndpoint();
-        const transformedData = cloneDeep(transform(this.data()));
-        return client[method](url, transformedData);
-      }, cloneDeep(defaults));
-      validatorRef = validator;
-      validator.on("validatingChanged", () => {
-        formWithPrecognition.validating = validator.validating();
-      }).on("validatedChanged", () => {
-        formWithPrecognition.__valid = validator.valid();
-      }).on("touchedChanged", () => {
-        formWithPrecognition.__touched = validator.touched();
-      }).on("errorsChanged", () => {
-        const validationErrors = withAllErrors ?? config.get("form.withAllErrors") ? validator.errors() : toSimpleValidationErrors(validator.errors());
-        this.errors = {};
-        this.setError(validationErrors);
-        formWithPrecognition.__valid = validator.valid();
-      });
-      const tap = (value, callback) => {
-        callback(value);
-        return value;
-      };
-      Object.assign(formWithPrecognition, {
-        __touched: [],
-        __valid: [],
-        validating: false,
-        validator: () => validator,
-        withAllErrors: () => tap(formWithPrecognition, () => withAllErrors = true),
-        valid: (field) => formWithPrecognition.__valid.includes(field),
-        invalid: (field) => field in this.errors,
-        setValidationTimeout: (duration) => tap(formWithPrecognition, () => validator.setTimeout(duration)),
-        validateFiles: () => tap(formWithPrecognition, () => validator.validateFiles()),
-        withoutFileValidation: () => tap(formWithPrecognition, () => validator.withoutFileValidation()),
-        touch: (field, ...fields) => {
-          if (Array.isArray(field)) {
-            validator.touch(field);
-          } else if (typeof field === "string") {
-            validator.touch([field, ...fields]);
-          } else {
-            validator.touch(field);
-          }
-          return formWithPrecognition;
-        },
-        touched: (field) => typeof field === "string" ? formWithPrecognition.__touched.includes(field) : formWithPrecognition.__touched.length > 0,
-        validate: (field, config3) => {
-          if (typeof field === "object" && !("target" in field)) {
-            config3 = field;
-            field = void 0;
-          }
-          if (field === void 0) {
-            validator.validate(config3);
-          } else {
-            const fieldName = resolveName(field);
-            const transformedData = transform(this.data());
-            validator.validate(fieldName, get(transformedData, fieldName), config3);
-          }
-          return formWithPrecognition;
-        },
-        setErrors: (errors) => tap(formWithPrecognition, () => this.setError(errors)),
-        forgetError: (field) => tap(
-          formWithPrecognition,
-          () => this.clearErrors(resolveName(field))
-        )
-      });
-      return formWithPrecognition;
-    },
-    data() {
-      return Object.keys(defaults).reduce((carry, key2) => {
-        return set(carry, key2, get(this, key2));
-      }, {});
-    },
-    transform(callback) {
-      transform = callback;
-      return this;
-    },
-    defaults(fieldOrFields, maybeValue) {
-      if (typeof data === "function") {
-        throw new Error("You cannot call `defaults()` when using a function to define your form data.");
-      }
-      defaultsCalledInOnSuccess = true;
-      if (typeof fieldOrFields === "undefined") {
-        defaults = cloneDeep(this.data());
-        this.isDirty = false;
-      } else {
-        defaults = typeof fieldOrFields === "string" ? set(cloneDeep(defaults), fieldOrFields, maybeValue) : Object.assign({}, cloneDeep(defaults), fieldOrFields);
-      }
-      validatorRef == null ? void 0 : validatorRef.defaults(defaults);
-      return this;
-    },
-    reset(...fields) {
-      const resolvedData = typeof data === "function" ? cloneDeep(data()) : cloneDeep(defaults);
-      const clonedData = cloneDeep(resolvedData);
-      if (fields.length === 0) {
-        defaults = clonedData;
-        Object.assign(this, resolvedData);
-      } else {
-        fields.filter((key2) => has(clonedData, key2)).forEach((key2) => {
-          set(defaults, key2, get(clonedData, key2));
-          set(this, key2, get(resolvedData, key2));
-        });
-      }
-      validatorRef == null ? void 0 : validatorRef.reset(...fields);
-      return this;
-    },
-    setError(fieldOrFields, maybeValue) {
-      const errors = typeof fieldOrFields === "string" ? { [fieldOrFields]: maybeValue } : fieldOrFields;
-      Object.assign(this.errors, errors);
-      this.hasErrors = Object.keys(this.errors).length > 0;
-      validatorRef == null ? void 0 : validatorRef.setErrors(errors);
-      return this;
-    },
-    clearErrors(...fields) {
-      this.errors = Object.keys(this.errors).reduce(
-        (carry, field) => ({
-          ...carry,
-          ...fields.length > 0 && !fields.includes(field) ? { [field]: this.errors[field] } : {}
-        }),
-        {}
-      );
-      this.hasErrors = Object.keys(this.errors).length > 0;
-      if (validatorRef) {
-        if (fields.length === 0) {
-          validatorRef.setErrors({});
-        } else {
-          fields.forEach(validatorRef.forgetError);
-        }
-      }
-      return this;
-    },
-    resetAndClearErrors(...fields) {
-      this.reset(...fields);
-      this.clearErrors(...fields);
-      return this;
-    },
-    submit(...args2) {
-      const { method, url, options } = UseFormUtils.parseSubmitArguments(args2, precognitionEndpoint);
-      defaultsCalledInOnSuccess = false;
-      const _options = {
-        ...options,
-        onCancelToken: (token) => {
-          cancelToken = token;
-          if (options.onCancelToken) {
-            return options.onCancelToken(token);
-          }
-        },
-        onBefore: (visit) => {
-          this.wasSuccessful = false;
-          this.recentlySuccessful = false;
-          clearTimeout(recentlySuccessfulTimeoutId);
-          if (options.onBefore) {
-            return options.onBefore(visit);
-          }
-        },
-        onStart: (visit) => {
-          this.processing = true;
-          if (options.onStart) {
-            return options.onStart(visit);
-          }
-        },
-        onProgress: (event) => {
-          this.progress = event ?? null;
-          if (options.onProgress) {
-            return options.onProgress(event);
-          }
-        },
-        onSuccess: async (page2) => {
-          this.processing = false;
-          this.progress = null;
-          this.clearErrors();
-          this.wasSuccessful = true;
-          this.recentlySuccessful = true;
-          recentlySuccessfulTimeoutId = setTimeout(
-            () => this.recentlySuccessful = false,
-            config.get("form.recentlySuccessfulDuration")
-          );
-          const onSuccess = options.onSuccess ? await options.onSuccess(page2) : null;
-          if (!defaultsCalledInOnSuccess) {
-            defaults = cloneDeep(this.data());
-            this.isDirty = false;
-          }
-          return onSuccess;
-        },
-        onError: (errors) => {
-          this.processing = false;
-          this.progress = null;
-          this.clearErrors().setError(errors);
-          if (options.onError) {
-            return options.onError(errors);
-          }
-        },
-        onCancel: () => {
-          this.processing = false;
-          this.progress = null;
-          if (options.onCancel) {
-            return options.onCancel();
-          }
-        },
-        onFinish: (visit) => {
-          this.processing = false;
-          this.progress = null;
-          cancelToken = null;
-          if (options.onFinish) {
-            return options.onFinish(visit);
-          }
-        }
-      };
-      const transformedData = transform(this.data());
-      if (method === "delete") {
-        router.delete(url, { ..._options, data: transformedData });
-      } else {
-        router[method](url, transformedData, _options);
-      }
-    },
-    get(url, options) {
-      this.submit("get", url, options);
-    },
-    post(url, options) {
-      this.submit("post", url, options);
-    },
-    put(url, options) {
-      this.submit("put", url, options);
-    },
-    patch(url, options) {
-      this.submit("patch", url, options);
-    },
-    delete(url, options) {
-      this.submit("delete", url, options);
-    },
-    cancel() {
-      if (cancelToken) {
-        cancelToken.cancel();
-      }
-    },
-    dontRemember(...keys) {
-      rememberExcludeKeys = keys;
-      return this;
-    },
-    __rememberable: rememberKey === null,
-    __remember() {
-      const data2 = this.data();
-      if (rememberExcludeKeys.length > 0) {
-        const filtered = { ...data2 };
-        rememberExcludeKeys.forEach((k) => delete filtered[k]);
-        return { data: filtered, errors: this.errors };
-      }
-      return { data: data2, errors: this.errors };
-    },
-    __restore(restored2) {
-      Object.assign(this, restored2.data);
-      this.setError(restored2.errors);
-    }
-  });
-  const typedForm = form;
-  vueExports.watch(
-    typedForm,
-    (newValue) => {
-      typedForm.isDirty = !isEqual(typedForm.data(), defaults);
-      const storedData = router.restore(rememberKey);
-      const newData = cloneDeep(newValue.__remember());
-      if (rememberKey && !isEqual(storedData, newData)) {
-        router.remember(newData, rememberKey);
-      }
-    },
-    { immediate: true, deep: true }
-  );
-  return precognitionEndpoint ? typedForm.withPrecognition(precognitionEndpoint) : typedForm;
+	const { rememberKey, data, precognitionEndpoint } = UseFormUtils.parseUseFormArguments(...args);
+	validateFormDataKeys(typeof data === "function" ? cloneDeep(data()) : cloneDeep(data));
+	let cancelToken = null;
+	let pendingOptimisticCallback = null;
+	const { form: baseForm, setDefaults, getTransform, getPrecognitionEndpoint, markAsSuccessful, wasDefaultsCalledInOnSuccess, resetDefaultsCalledInOnSuccess, setRememberExcludeKeys, resetBeforeSubmit, finishProcessing } = useFormState({
+		data,
+		rememberKey,
+		precognitionEndpoint
+	});
+	const form = baseForm;
+	const createSubmitMethod = (method) => (url, options = {}) => {
+		form.submit(method, url, options);
+	};
+	Object.assign(form, {
+		submit(...args2) {
+			const { method, url, options } = UseFormUtils.parseSubmitArguments(args2, getPrecognitionEndpoint());
+			resetDefaultsCalledInOnSuccess();
+			const _options = {
+				...options,
+				onCancelToken: (token) => {
+					cancelToken = token;
+					return options.onCancelToken?.(token);
+				},
+				onBefore: (visit) => {
+					resetBeforeSubmit();
+					return options.onBefore?.(visit);
+				},
+				onStart: (visit) => {
+					form.processing = true;
+					return options.onStart?.(visit);
+				},
+				onProgress: (event) => {
+					form.progress = event ?? null;
+					return options.onProgress?.(event);
+				},
+				onSuccess: async (page2) => {
+					markAsSuccessful();
+					const onSuccess = options.onSuccess ? await options.onSuccess(page2) : null;
+					if (!wasDefaultsCalledInOnSuccess()) {
+						setDefaults(cloneDeep(form.data()));
+						form.isDirty = false;
+					}
+					return onSuccess;
+				},
+				onError: (errors) => {
+					form.clearErrors().setError(errors);
+					return options.onError?.(errors);
+				},
+				onCancel: () => {
+					return options.onCancel?.();
+				},
+				onFinish: (visit) => {
+					finishProcessing();
+					cancelToken = null;
+					return options.onFinish?.(visit);
+				}
+			};
+			_options.optimistic = _options.optimistic ?? pendingOptimisticCallback ?? void 0;
+			pendingOptimisticCallback = null;
+			const transformedData = getTransform()(form.data());
+			if (method === "delete") router.delete(url, {
+				..._options,
+				data: transformedData
+			});
+			else router[method](url, transformedData, _options);
+		},
+		get: createSubmitMethod("get"),
+		post: createSubmitMethod("post"),
+		put: createSubmitMethod("put"),
+		patch: createSubmitMethod("patch"),
+		delete: createSubmitMethod("delete"),
+		query: createSubmitMethod("query"),
+		cancel() {
+			if (cancelToken) cancelToken.cancel();
+		},
+		dontRemember(...keys) {
+			setRememberExcludeKeys(keys);
+			return form;
+		},
+		optimistic(callback) {
+			pendingOptimisticCallback = callback;
+			return form;
+		}
+	});
+	return getPrecognitionEndpoint() ? form : form;
 }
-var component = vueExports.ref(void 0);
-var page = vueExports.ref();
-var layout = vueExports.shallowRef(null);
-var key = vueExports.ref(void 0);
+function isComponent(value) {
+	if (!value) return false;
+	if (typeof value === "function") return true;
+	if (typeof value === "object") {
+		const obj = value;
+		return typeof obj.render === "function" || typeof obj.setup === "function" || typeof obj.template === "string" || "__file" in obj || "__name" in obj;
+	}
+	return false;
+}
+function isRenderFunction(value) {
+	if (typeof value !== "function") return false;
+	const fn = value;
+	return fn.length === 2 && typeof fn.prototype === "undefined";
+}
+var component = (0, vue_exports.ref)(void 0);
+var page = (0, vue_exports.ref)();
+var pageAccessor = null;
+var layout = (0, vue_exports.shallowRef)(null);
+var key = (0, vue_exports.ref)(void 0);
 var headManager;
-var App = vueExports.defineComponent({
-  name: "Inertia",
-  props: {
-    initialPage: {
-      type: Object,
-      required: true
-    },
-    initialComponent: {
-      type: Object,
-      required: false
-    },
-    resolveComponent: {
-      type: Function,
-      required: false
-    },
-    titleCallback: {
-      type: Function,
-      required: false,
-      default: (title) => title
-    },
-    onHeadUpdate: {
-      type: Function,
-      required: false,
-      default: () => () => {
-      }
-    }
-  },
-  setup({ initialPage, initialComponent, resolveComponent, titleCallback, onHeadUpdate }) {
-    component.value = initialComponent ? vueExports.markRaw(initialComponent) : void 0;
-    page.value = { ...initialPage, flash: initialPage.flash ?? {} };
-    key.value = void 0;
-    const isServer = typeof window === "undefined";
-    headManager = createHeadManager(isServer, titleCallback || ((title) => title), onHeadUpdate || (() => {
-    }));
-    if (!isServer) {
-      router.init({
-        initialPage,
-        resolveComponent,
-        swapComponent: async (options) => {
-          component.value = vueExports.markRaw(options.component);
-          page.value = options.page;
-          key.value = options.preserveState ? key.value : Date.now();
-        },
-        onFlash: (flash) => {
-          page.value = { ...page.value, flash };
-        }
-      });
-      router.on("navigate", () => headManager.forceUpdate());
-    }
-    return () => {
-      if (component.value) {
-        component.value.inheritAttrs = !!component.value.inheritAttrs;
-        const child = vueExports.h(component.value, {
-          ...page.value.props,
-          key: key.value
-        });
-        if (layout.value) {
-          component.value.layout = layout.value;
-          layout.value = null;
-        }
-        if (component.value.layout) {
-          if (typeof component.value.layout === "function") {
-            return component.value.layout(vueExports.h, child);
-          }
-          return (Array.isArray(component.value.layout) ? component.value.layout : [component.value.layout]).concat(child).reverse().reduce((child2, layout2) => {
-            layout2.inheritAttrs = !!layout2.inheritAttrs;
-            return vueExports.h(layout2, { ...page.value.props }, () => child2);
-          });
-        }
-        return child;
-      }
-    };
-  }
+var app_default = (0, vue_exports.defineComponent)({
+	name: "Inertia",
+	props: {
+		initialPage: {
+			type: Object,
+			required: true
+		},
+		initialComponent: {
+			type: Object,
+			required: false
+		},
+		resolveComponent: {
+			type: Function,
+			required: false
+		},
+		titleCallback: {
+			type: Function,
+			required: false,
+			default: (title) => title
+		},
+		onHeadUpdate: {
+			type: Function,
+			required: false,
+			default: () => () => {}
+		},
+		defaultLayout: {
+			type: Function,
+			required: false
+		},
+		serverHead: {
+			type: [
+				Boolean,
+				String,
+				Function
+			],
+			required: false
+		},
+		serverRendered: {
+			type: Boolean,
+			required: false,
+			default: true
+		}
+	},
+	setup({ initialPage, initialComponent, resolveComponent, titleCallback, onHeadUpdate, defaultLayout, serverHead, serverRendered }) {
+		component.value = initialComponent ? (0, vue_exports.markRaw)(initialComponent) : void 0;
+		page.value = {
+			...initialPage,
+			flash: initialPage.flash ?? {}
+		};
+		key.value = void 0;
+		const isServer = typeof window === "undefined";
+		headManager = createHeadManager(isServer, (title) => titleCallback ? titleCallback(title, page.value) : title, onHeadUpdate || (() => {}), resolveServerHead(initialPage, serverHead));
+		const hydrated = (0, vue_exports.ref)(!serverRendered);
+		provideHydrationContext(hydrated);
+		if (!isServer) {
+			(0, vue_exports.onMounted)(() => hydrated.value = true);
+			router.init({
+				initialPage,
+				resolveComponent,
+				swapComponent: async (options) => {
+					if (!options.preserveState) resetLayoutProps();
+					component.value = (0, vue_exports.markRaw)(options.component);
+					page.value = options.page;
+					key.value = options.preserveState ? key.value : Date.now();
+				},
+				onFlash: (flash) => {
+					page.value = {
+						...page.value,
+						flash
+					};
+				}
+			});
+			const syncServerHead = (event) => {
+				headManager.updateServerHead(resolveServerHead(event.detail.page, serverHead));
+			};
+			router.on("navigate", syncServerHead);
+			router.on("clientVisit", syncServerHead);
+		}
+		return () => {
+			if (component.value) {
+				component.value.inheritAttrs = !!component.value.inheritAttrs;
+				const child = (0, vue_exports.h)(component.value, {
+					...page.value.props,
+					key: key.value
+				});
+				if (layout.value) {
+					component.value.layout = layout.value;
+					layout.value = null;
+				}
+				if (component.value.layout && isRenderFunction(component.value.layout)) return component.value.layout(vue_exports.h, child);
+				let effectiveLayout;
+				let callbackProps = null;
+				const layoutValue = component.value.layout;
+				if (typeof layoutValue === "function" && layoutValue.length <= 1 && typeof layoutValue.prototype === "undefined") {
+					const result = layoutValue(page.value.props);
+					if (isPropsObjectOrCallback(result, isComponent)) {
+						effectiveLayout = defaultLayout?.(page.value.component, page.value);
+						callbackProps = result;
+					} else effectiveLayout = result;
+				} else if (isPropsObject(layoutValue, isComponent)) {
+					effectiveLayout = defaultLayout?.(page.value.component, page.value);
+					callbackProps = layoutValue;
+				} else effectiveLayout = layoutValue ?? defaultLayout?.(page.value.component, page.value);
+				if (effectiveLayout) {
+					let layouts = normalizeLayouts(effectiveLayout, isComponent, component.value.layout && !callbackProps ? isRenderFunction : void 0);
+					if (callbackProps) layouts = layouts.map((l) => ({
+						...l,
+						props: {
+							...l.props,
+							...callbackProps
+						}
+					}));
+					if (layouts.length > 0) {
+						const dynamicProps = isServer ? {
+							shared: {},
+							named: {}
+						} : state.value;
+						return layouts.reduceRight((childNode, layout2) => {
+							const layoutComponent = layout2.component;
+							layoutComponent.inheritAttrs = !!layoutComponent.inheritAttrs;
+							return (0, vue_exports.h)(layoutComponent, {
+								...page.value.props,
+								...layout2.props,
+								...dynamicProps.shared,
+								...layout2.name ? dynamicProps.named[layout2.name] || {} : {}
+							}, () => childNode);
+						}, child);
+					}
+				}
+				return child;
+			}
+		};
+	}
 });
-var app_default = App;
-var plugin = {
-  install(app) {
-    router.form = useForm;
-    Object.defineProperty(app.config.globalProperties, "$inertia", { get: () => router });
-    Object.defineProperty(app.config.globalProperties, "$page", { get: () => page.value });
-    Object.defineProperty(app.config.globalProperties, "$headManager", { get: () => headManager });
-    app.mixin(remember_default);
-  }
-};
+var plugin = { install(app) {
+	router.form = useForm;
+	Object.defineProperty(app.config.globalProperties, "$inertia", { get: () => router });
+	Object.defineProperty(app.config.globalProperties, "$page", { get: () => page.value });
+	Object.defineProperty(app.config.globalProperties, "$headManager", { get: () => headManager });
+	app.mixin(remember_default);
+} };
 function usePage() {
-  return vueExports.reactive({
-    props: vueExports.computed(() => {
-      var _a;
-      return (_a = page.value) == null ? void 0 : _a.props;
-    }),
-    url: vueExports.computed(() => {
-      var _a;
-      return (_a = page.value) == null ? void 0 : _a.url;
-    }),
-    component: vueExports.computed(() => {
-      var _a;
-      return (_a = page.value) == null ? void 0 : _a.component;
-    }),
-    version: vueExports.computed(() => {
-      var _a;
-      return (_a = page.value) == null ? void 0 : _a.version;
-    }),
-    clearHistory: vueExports.computed(() => {
-      var _a;
-      return (_a = page.value) == null ? void 0 : _a.clearHistory;
-    }),
-    deferredProps: vueExports.computed(() => {
-      var _a;
-      return (_a = page.value) == null ? void 0 : _a.deferredProps;
-    }),
-    mergeProps: vueExports.computed(() => {
-      var _a;
-      return (_a = page.value) == null ? void 0 : _a.mergeProps;
-    }),
-    prependProps: vueExports.computed(() => {
-      var _a;
-      return (_a = page.value) == null ? void 0 : _a.prependProps;
-    }),
-    deepMergeProps: vueExports.computed(() => {
-      var _a;
-      return (_a = page.value) == null ? void 0 : _a.deepMergeProps;
-    }),
-    matchPropsOn: vueExports.computed(() => {
-      var _a;
-      return (_a = page.value) == null ? void 0 : _a.matchPropsOn;
-    }),
-    rememberedState: vueExports.computed(() => {
-      var _a;
-      return (_a = page.value) == null ? void 0 : _a.rememberedState;
-    }),
-    encryptHistory: vueExports.computed(() => {
-      var _a;
-      return (_a = page.value) == null ? void 0 : _a.encryptHistory;
-    }),
-    flash: vueExports.computed(() => {
-      var _a;
-      return (_a = page.value) == null ? void 0 : _a.flash;
-    })
-  });
+	if (!pageAccessor) pageAccessor = (0, vue_exports.reactive)({
+		props: (0, vue_exports.computed)(() => page.value?.props),
+		url: (0, vue_exports.computed)(() => page.value?.url),
+		component: (0, vue_exports.computed)(() => page.value?.component),
+		version: (0, vue_exports.computed)(() => page.value?.version),
+		clearHistory: (0, vue_exports.computed)(() => page.value?.clearHistory),
+		deferredProps: (0, vue_exports.computed)(() => page.value?.deferredProps),
+		rescuedProps: (0, vue_exports.computed)(() => page.value?.rescuedProps),
+		mergeProps: (0, vue_exports.computed)(() => page.value?.mergeProps),
+		prependProps: (0, vue_exports.computed)(() => page.value?.prependProps),
+		deepMergeProps: (0, vue_exports.computed)(() => page.value?.deepMergeProps),
+		matchPropsOn: (0, vue_exports.computed)(() => page.value?.matchPropsOn),
+		rememberedState: (0, vue_exports.computed)(() => page.value?.rememberedState),
+		encryptHistory: (0, vue_exports.computed)(() => page.value?.encryptHistory),
+		scrollProps: (0, vue_exports.computed)(() => page.value?.scrollProps),
+		liveProps: (0, vue_exports.computed)(() => page.value?.liveProps),
+		flash: (0, vue_exports.computed)(() => page.value?.flash)
+	});
+	return pageAccessor;
 }
-async function createInertiaApp({
-  id = "app",
-  resolve,
-  setup,
-  title,
-  progress: progress2 = {},
-  page: page2,
-  render,
-  defaults = {}
-}) {
-  config.replace(defaults);
-  const isServer = typeof window === "undefined";
-  const useScriptElementForInitialPage = config.get("future.useScriptElementForInitialPage");
-  const initialPage = page2 || getInitialPageFromDOM(id, useScriptElementForInitialPage);
-  const resolveComponent = (name) => Promise.resolve(resolve(name)).then((module) => module.default || module);
-  let head = [];
-  const vueApp = await Promise.all([
-    resolveComponent(initialPage.component),
-    router.decryptHistory().catch(() => {
-    })
-  ]).then(([initialComponent]) => {
-    const props = {
-      initialPage,
-      initialComponent,
-      resolveComponent,
-      titleCallback: title
-    };
-    if (isServer) {
-      const ssrSetup = setup;
-      return ssrSetup({
-        el: null,
-        App: app_default,
-        props: { ...props, onHeadUpdate: (elements) => head = elements },
-        plugin
-      });
-    }
-    const csrSetup = setup;
-    return csrSetup({
-      el: document.getElementById(id),
-      App: app_default,
-      props,
-      plugin
-    });
-  });
-  if (!isServer && progress2) {
-    setupProgress(progress2);
-  }
-  if (isServer && render) {
-    const element = () => {
-      if (!useScriptElementForInitialPage) {
-        return vueExports.h("div", {
-          id,
-          "data-page": JSON.stringify(initialPage),
-          innerHTML: vueApp ? render(vueApp) : ""
-        });
-      }
-      return [
-        vueExports.h("script", {
-          "data-page": id,
-          type: "application/json",
-          innerHTML: JSON.stringify(initialPage).replace(/\//g, "\\/")
-        }),
-        vueExports.h("div", {
-          id,
-          innerHTML: vueApp ? render(vueApp) : ""
-        })
-      ];
-    };
-    const body = await render(
-      vueExports.createSSRApp({
-        render: () => element()
-      })
-    );
-    return { head, body };
-  }
+async function createInertiaApp({ id = "app", resolve, setup, title, progress: progress2 = {}, page: page2, render, defaults = {}, nonce, http: http3, live, layout: layout2, serverHead, withApp, dev = false } = {}) {
+	config$1.replace(defaults);
+	if (nonce) config$1.set("nonce", nonce);
+	if (http3) http.setClient(http3);
+	if (live) configureLive(live);
+	if (dev) exposeInterceptors();
+	const isServer = typeof window === "undefined";
+	const resolveComponent = (name, page3) => Promise.resolve(resolve(name, page3)).then((module) => module.default || module);
+	if (isServer && !page2 && !render) return async (page3, renderToString) => {
+		let head2 = [];
+		const props = {
+			initialPage: page3,
+			initialComponent: await resolveComponent(page3.component, page3),
+			resolveComponent,
+			titleCallback: title,
+			onHeadUpdate: (elements) => head2 = elements,
+			defaultLayout: layout2,
+			serverHead,
+			serverRendered: true
+		};
+		let vueApp2;
+		if (setup) vueApp2 = setup({
+			el: null,
+			App: app_default,
+			props,
+			plugin
+		});
+		else {
+			vueApp2 = (0, vue_exports.createSSRApp)({ render: () => (0, vue_exports.h)(app_default, props) });
+			vueApp2.use(plugin);
+			if (withApp) withApp(vueApp2, {
+				ssr: true,
+				page: page3
+			});
+		}
+		const html = await renderToString(vueApp2);
+		const body = buildSSRBody(id, page3, html);
+		return {
+			head: head2,
+			body
+		};
+	};
+	const initialPage = page2 || getInitialPageFromDOM(id);
+	let head = [];
+	const vueApp = await Promise.all([resolveComponent(initialPage.component, initialPage), router.decryptHistory().catch(() => {})]).then(([initialComponent]) => {
+		const el = isServer ? null : document.getElementById(id);
+		const props = {
+			initialPage,
+			initialComponent,
+			resolveComponent,
+			titleCallback: title,
+			onHeadUpdate: isServer ? (elements) => head = elements : void 0,
+			defaultLayout: layout2,
+			serverHead,
+			serverRendered: isServer || el.hasAttribute("data-server-rendered")
+		};
+		if (isServer) return setup({
+			el: null,
+			App: app_default,
+			props,
+			plugin
+		});
+		const target = el;
+		const isServerRendered = props.serverRendered;
+		if (setup) return setup({
+			el: target,
+			App: app_default,
+			props,
+			plugin
+		});
+		if (isServerRendered) {
+			const app = (0, vue_exports.createSSRApp)({ render: () => (0, vue_exports.h)(app_default, props) });
+			app.use(plugin);
+			if (withApp) withApp(app, {
+				ssr: false,
+				page: initialPage
+			});
+			app.mount(target);
+		} else {
+			const app = (0, vue_exports.createApp)({ render: () => (0, vue_exports.h)(app_default, props) });
+			app.use(plugin);
+			if (withApp) withApp(app, {
+				ssr: false,
+				page: initialPage
+			});
+			app.mount(target);
+		}
+	});
+	if (!isServer && progress2) setupProgress(progress2);
+	if (isServer && render && vueApp) {
+		const html = await render(vueApp);
+		const body = buildSSRBody(id, initialPage, html);
+		return {
+			head,
+			body
+		};
+	}
 }
-vueExports.defineComponent({
-  name: "Deferred",
-  props: {
-    data: {
-      type: [String, Array],
-      required: true
-    }
-  },
-  render() {
-    var _a, _b;
-    const keys = Array.isArray(this.$props.data) ? this.$props.data : [this.$props.data];
-    if (!this.$slots.fallback) {
-      throw new Error("`<Deferred>` requires a `<template #fallback>` slot");
-    }
-    return keys.every((key2) => this.$page.props[key2] !== void 0) ? (_b = (_a = this.$slots).default) == null ? void 0 : _b.call(_a) : this.$slots.fallback();
-  }
+(0, vue_exports.defineComponent)({
+	name: "Deferred",
+	props: { data: {
+		type: [String, Array],
+		required: true
+	} },
+	slots: Object,
+	setup(props, { slots }) {
+		const reloading = (0, vue_exports.ref)(false);
+		const activeReloads = /* @__PURE__ */ new Set();
+		const page2 = usePage();
+		const keys = (0, vue_exports.computed)(() => Array.isArray(props.data) ? props.data : [props.data]);
+		const rescuedKeys = (0, vue_exports.computed)(() => new Set(page2.rescuedProps));
+		let removeStartListener = null;
+		let removeFinishListener = null;
+		(0, vue_exports.onMounted)(() => {
+			removeStartListener = router.on("start", (e) => {
+				const visit = e.detail.visit;
+				if (visit.preserveState === true && isSameUrlWithoutQueryOrHash(visit.url, window.location) && partialReloadRequestsSomeProps(visit, keys.value)) {
+					activeReloads.add(visit);
+					reloading.value = true;
+				}
+			});
+			removeFinishListener = router.on("finish", (e) => {
+				const visit = e.detail.visit;
+				if (activeReloads.has(visit)) {
+					activeReloads.delete(visit);
+					reloading.value = activeReloads.size > 0;
+				}
+			});
+		});
+		(0, vue_exports.onUnmounted)(() => {
+			removeStartListener?.();
+			removeFinishListener?.();
+			activeReloads.clear();
+		});
+		return () => {
+			if (!slots.fallback) throw new Error("`<Deferred>` requires a `<template #fallback>` slot");
+			const propsAreDefined = keys.value.every((key2) => get(page2.props, key2) !== void 0);
+			const hasRescuedProps = keys.value.some((key2) => rescuedKeys.value.has(key2));
+			const slotProps = { reloading: reloading.value };
+			if (propsAreDefined && !hasRescuedProps) return (0, vue_exports.h)(vue_exports.Fragment, { key: "default" }, slots.default?.(slotProps) ?? []);
+			if (hasRescuedProps && slots.rescue) return (0, vue_exports.h)(vue_exports.Fragment, { key: "rescue" }, slots.rescue(slotProps));
+			return (0, vue_exports.h)(vue_exports.Fragment, { key: "fallback" }, slots.fallback({}));
+		};
+	}
 });
 var noop = () => void 0;
 var FormContextKey = /* @__PURE__ */ Symbol("InertiaFormContext");
-vueExports.defineComponent({
-  name: "Form",
-  slots: Object,
-  props: {
-    action: {
-      type: [String, Object],
-      default: ""
-    },
-    method: {
-      type: String,
-      default: "get"
-    },
-    headers: {
-      type: Object,
-      default: () => ({})
-    },
-    queryStringArrayFormat: {
-      type: String,
-      default: "brackets"
-    },
-    errorBag: {
-      type: [String, null],
-      default: null
-    },
-    showProgress: {
-      type: Boolean,
-      default: true
-    },
-    transform: {
-      type: Function,
-      default: (data) => data
-    },
-    options: {
-      type: Object,
-      default: () => ({})
-    },
-    resetOnError: {
-      type: [Boolean, Array],
-      default: false
-    },
-    resetOnSuccess: {
-      type: [Boolean, Array],
-      default: false
-    },
-    setDefaultsOnSuccess: {
-      type: Boolean,
-      default: false
-    },
-    onCancelToken: {
-      type: Function,
-      default: noop
-    },
-    onBefore: {
-      type: Function,
-      default: noop
-    },
-    onStart: {
-      type: Function,
-      default: noop
-    },
-    onProgress: {
-      type: Function,
-      default: noop
-    },
-    onFinish: {
-      type: Function,
-      default: noop
-    },
-    onCancel: {
-      type: Function,
-      default: noop
-    },
-    onSuccess: {
-      type: Function,
-      default: noop
-    },
-    onError: {
-      type: Function,
-      default: noop
-    },
-    onSubmitComplete: {
-      type: Function,
-      default: noop
-    },
-    disableWhileProcessing: {
-      type: Boolean,
-      default: false
-    },
-    invalidateCacheTags: {
-      type: [String, Array],
-      default: () => []
-    },
-    validateFiles: {
-      type: Boolean,
-      default: false
-    },
-    validationTimeout: {
-      type: Number,
-      default: 1500
-    },
-    withAllErrors: {
-      type: Boolean,
-      default: null
-    }
-  },
-  setup(props, { slots, attrs, expose }) {
-    const getTransformedData = () => {
-      const [_url, data] = getUrlAndData();
-      return props.transform(data);
-    };
-    const form = useForm({}).withPrecognition(
-      () => method.value,
-      () => getUrlAndData()[0]
-    ).transform(getTransformedData).setValidationTimeout(props.validationTimeout);
-    if (props.validateFiles) {
-      form.validateFiles();
-    }
-    if (props.withAllErrors ?? config$1.get("form.withAllErrors")) {
-      form.withAllErrors();
-    }
-    const formElement = vueExports.ref();
-    const method = vueExports.computed(
-      () => isUrlMethodPair(props.action) ? props.action.method : props.method.toLowerCase()
-    );
-    const isDirty = vueExports.ref(false);
-    const defaultData = vueExports.ref(new FormData());
-    const onFormUpdate = (event) => {
-      var _a;
-      if (event.type === "reset" && ((_a = event.detail) == null ? void 0 : _a[FormComponentResetSymbol])) {
-        event.preventDefault();
-      }
-      isDirty.value = event.type === "reset" ? false : !isEqual(getData(), formDataToObject(defaultData.value));
-    };
-    const formEvents = ["input", "change", "reset"];
-    vueExports.onMounted(() => {
-      defaultData.value = getFormData();
-      form.defaults(getData());
-      formEvents.forEach((e2) => formElement.value.addEventListener(e2, onFormUpdate));
-    });
-    vueExports.watch(
-      () => props.validateFiles,
-      (value) => value ? form.validateFiles() : form.withoutFileValidation()
-    );
-    vueExports.watch(
-      () => props.validationTimeout,
-      (value) => form.setValidationTimeout(value)
-    );
-    vueExports.onBeforeUnmount(() => formEvents.forEach((e2) => {
-      var _a;
-      return (_a = formElement.value) == null ? void 0 : _a.removeEventListener(e2, onFormUpdate);
-    }));
-    const getFormData = (submitter) => new FormData(formElement.value, submitter);
-    const getData = (submitter) => formDataToObject(getFormData(submitter));
-    const getUrlAndData = (submitter) => {
-      return mergeDataIntoQueryString(
-        method.value,
-        isUrlMethodPair(props.action) ? props.action.url : props.action,
-        getData(submitter),
-        props.queryStringArrayFormat
-      );
-    };
-    const submit = (submitter) => {
-      const [url, data] = getUrlAndData(submitter);
-      const formTarget = submitter == null ? void 0 : submitter.getAttribute("formtarget");
-      if (formTarget === "_blank" && method.value === "get") {
-        window.open(url, "_blank");
-        return;
-      }
-      const maybeReset = (resetOption) => {
-        if (!resetOption) {
-          return;
-        }
-        if (resetOption === true) {
-          reset();
-        } else if (resetOption.length > 0) {
-          reset(...resetOption);
-        }
-      };
-      const submitOptions = {
-        headers: props.headers,
-        queryStringArrayFormat: props.queryStringArrayFormat,
-        errorBag: props.errorBag,
-        showProgress: props.showProgress,
-        invalidateCacheTags: props.invalidateCacheTags,
-        onCancelToken: props.onCancelToken,
-        onBefore: props.onBefore,
-        onStart: props.onStart,
-        onProgress: props.onProgress,
-        onFinish: props.onFinish,
-        onCancel: props.onCancel,
-        onSuccess: (...args) => {
-          var _a, _b;
-          (_a = props.onSuccess) == null ? void 0 : _a.call(props, ...args);
-          (_b = props.onSubmitComplete) == null ? void 0 : _b.call(props, exposed);
-          maybeReset(props.resetOnSuccess);
-          if (props.setDefaultsOnSuccess === true) {
-            defaults();
-          }
-        },
-        onError: (...args) => {
-          var _a;
-          (_a = props.onError) == null ? void 0 : _a.call(props, ...args);
-          maybeReset(props.resetOnError);
-        },
-        ...props.options
-      };
-      form.transform(() => props.transform(data)).submit(method.value, url, submitOptions);
-      form.transform(getTransformedData);
-    };
-    const reset = (...fields) => {
-      resetFormFields(formElement.value, defaultData.value, fields);
-      form.reset(...fields);
-    };
-    const clearErrors = (...fields) => {
-      form.clearErrors(...fields);
-    };
-    const resetAndClearErrors = (...fields) => {
-      clearErrors(...fields);
-      reset(...fields);
-    };
-    const defaults = () => {
-      defaultData.value = getFormData();
-      isDirty.value = false;
-    };
-    const exposed = {
-      get errors() {
-        return form.errors;
-      },
-      get hasErrors() {
-        return form.hasErrors;
-      },
-      get processing() {
-        return form.processing;
-      },
-      get progress() {
-        return form.progress;
-      },
-      get wasSuccessful() {
-        return form.wasSuccessful;
-      },
-      get recentlySuccessful() {
-        return form.recentlySuccessful;
-      },
-      get validating() {
-        return form.validating;
-      },
-      clearErrors,
-      resetAndClearErrors,
-      setError: (fieldOrFields, maybeValue) => form.setError(typeof fieldOrFields === "string" ? { [fieldOrFields]: maybeValue } : fieldOrFields),
-      get isDirty() {
-        return isDirty.value;
-      },
-      reset,
-      submit,
-      defaults,
-      getData,
-      getFormData,
-      // Precognition
-      touch: form.touch,
-      valid: form.valid,
-      invalid: form.invalid,
-      touched: form.touched,
-      validate: (field, config3) => form.validate(...UseFormUtils.mergeHeadersForValidation(field, config3, props.headers)),
-      validator: () => form.validator()
-    };
-    expose(exposed);
-    vueExports.provide(FormContextKey, exposed);
-    return () => {
-      return vueExports.h(
-        "form",
-        {
-          ...attrs,
-          ref: formElement,
-          action: isUrlMethodPair(props.action) ? props.action.url : props.action,
-          method: method.value,
-          onSubmit: (event) => {
-            event.preventDefault();
-            submit(event.submitter);
-          },
-          inert: props.disableWhileProcessing && form.processing
-        },
-        slots.default ? slots.default(exposed) : []
-      );
-    };
-  }
+(0, vue_exports.defineComponent)({
+	name: "Form",
+	slots: Object,
+	props: {
+		action: {
+			type: [String, Object],
+			default: ""
+		},
+		method: {
+			type: String,
+			default: "get"
+		},
+		headers: {
+			type: Object,
+			default: () => ({})
+		},
+		queryStringArrayFormat: {
+			type: String,
+			default: "brackets"
+		},
+		errorBag: {
+			type: [String, null],
+			default: null
+		},
+		showProgress: {
+			type: Boolean,
+			default: true
+		},
+		transform: {
+			type: Function,
+			default: (data) => data
+		},
+		options: {
+			type: Object,
+			default: () => ({})
+		},
+		resetOnError: {
+			type: [Boolean, Array],
+			default: false
+		},
+		resetOnSuccess: {
+			type: [Boolean, Array],
+			default: false
+		},
+		setDefaultsOnSuccess: {
+			type: Boolean,
+			default: false
+		},
+		onCancelToken: {
+			type: Function,
+			default: noop
+		},
+		onBefore: {
+			type: Function,
+			default: noop
+		},
+		onStart: {
+			type: Function,
+			default: noop
+		},
+		onProgress: {
+			type: Function,
+			default: noop
+		},
+		onFinish: {
+			type: Function,
+			default: noop
+		},
+		onCancel: {
+			type: Function,
+			default: noop
+		},
+		onSuccess: {
+			type: Function,
+			default: noop
+		},
+		onError: {
+			type: Function,
+			default: noop
+		},
+		onHttpException: {
+			type: Function,
+			default: noop
+		},
+		onNetworkError: {
+			type: Function,
+			default: noop
+		},
+		onFlash: {
+			type: Function,
+			default: noop
+		},
+		onSubmitComplete: {
+			type: Function,
+			default: noop
+		},
+		disableWhileProcessing: {
+			type: Boolean,
+			default: false
+		},
+		cancelOnUnmount: {
+			type: Boolean,
+			default: false
+		},
+		invalidateCacheTags: {
+			type: [String, Array],
+			default: () => []
+		},
+		validateFiles: {
+			type: Boolean,
+			default: false
+		},
+		validationTimeout: {
+			type: Number,
+			default: 1500
+		},
+		optimistic: {
+			type: Function,
+			default: void 0
+		},
+		withAllErrors: {
+			type: Boolean,
+			default: null
+		},
+		component: {
+			type: String,
+			default: null
+		},
+		instant: {
+			type: Boolean,
+			default: false
+		}
+	},
+	setup(props, { slots, attrs, expose }) {
+		const getTransformedData = () => {
+			const [_url, data] = getUrlAndData();
+			return props.transform(data);
+		};
+		const form = useForm({}).withPrecognition(() => method.value, () => getUrlAndData()[0]).transform(getTransformedData).setValidationTimeout(props.validationTimeout);
+		if (props.validateFiles) form.validateFiles();
+		if (props.withAllErrors ?? config.get("form.withAllErrors")) form.withAllErrors();
+		const formElement = (0, vue_exports.ref)();
+		const method = (0, vue_exports.computed)(() => isUrlMethodPair(props.action) ? props.action.method : props.method.toLowerCase());
+		const resolvedComponent = (0, vue_exports.computed)(() => {
+			if (props.component) return props.component;
+			if (props.instant && isUrlMethodPair(props.action)) return resolveUrlMethodPairComponent(props.action);
+			return null;
+		});
+		const isDirty = (0, vue_exports.ref)(false);
+		const defaultData = (0, vue_exports.ref)(new FormData());
+		const onFormUpdate = (event) => {
+			if (event.type === "reset" && event.detail?.[FormComponentResetSymbol]) event.preventDefault();
+			isDirty.value = event.type === "reset" ? false : !isEqual(getData(), formDataToObject(defaultData.value));
+		};
+		const formEvents = [
+			"input",
+			"change",
+			"reset"
+		];
+		(0, vue_exports.onMounted)(() => {
+			defaultData.value = getFormData();
+			form.defaults(getData());
+			formEvents.forEach((e) => formElement.value.addEventListener(e, onFormUpdate));
+		});
+		(0, vue_exports.watch)(() => props.validateFiles, (value) => value ? form.validateFiles() : form.withoutFileValidation());
+		(0, vue_exports.watch)(() => props.validationTimeout, (value) => form.setValidationTimeout(value));
+		(0, vue_exports.onBeforeUnmount)(() => {
+			formEvents.forEach((e) => formElement.value?.removeEventListener(e, onFormUpdate));
+			if (props.cancelOnUnmount) form.cancel();
+		});
+		const getFormData = (submitter) => new FormData(formElement.value, submitter);
+		const getData = (submitter) => formDataToObject(getFormData(submitter));
+		const getUrlAndData = (submitter) => {
+			return mergeDataIntoQueryString(method.value, isUrlMethodPair(props.action) ? props.action.url : props.action, getData(submitter), props.queryStringArrayFormat);
+		};
+		const submit = (submitter) => {
+			const [url, data] = getUrlAndData(submitter);
+			if (submitter?.getAttribute("formtarget") === "_blank" && method.value === "get") {
+				window.open(url, "_blank");
+				return;
+			}
+			const maybeReset = (resetOption) => {
+				if (!resetOption) return;
+				if (resetOption === true) reset();
+				else if (resetOption.length > 0) reset(...resetOption);
+			};
+			const submitOptions = {
+				headers: props.headers,
+				queryStringArrayFormat: props.queryStringArrayFormat,
+				errorBag: props.errorBag,
+				showProgress: props.showProgress,
+				invalidateCacheTags: props.invalidateCacheTags,
+				component: resolvedComponent.value,
+				optimistic: props.optimistic ? (pageProps) => props.optimistic(pageProps, data) : void 0,
+				onCancelToken: props.onCancelToken,
+				onBefore: props.onBefore,
+				onStart: props.onStart,
+				onProgress: props.onProgress,
+				onFinish: props.onFinish,
+				onCancel: props.onCancel,
+				onHttpException: props.onHttpException,
+				onNetworkError: props.onNetworkError,
+				onFlash: props.onFlash,
+				onSuccess: async (...args) => {
+					const result = await props.onSuccess?.(...args);
+					props.onSubmitComplete?.(exposed);
+					maybeReset(props.resetOnSuccess);
+					if (props.setDefaultsOnSuccess === true) defaults();
+					return result;
+				},
+				onError: (...args) => {
+					props.onError?.(...args);
+					maybeReset(props.resetOnError);
+				},
+				...props.options
+			};
+			form.transform(() => props.transform(data)).submit(method.value, url, submitOptions);
+			form.transform(getTransformedData);
+		};
+		const reset = (...fields) => {
+			resetFormFields(formElement.value, defaultData.value, fields);
+			form.reset(...fields);
+		};
+		const clearErrors = (...fields) => {
+			form.clearErrors(...fields);
+		};
+		const resetAndClearErrors = (...fields) => {
+			clearErrors(...fields);
+			reset(...fields);
+		};
+		const defaults = () => {
+			defaultData.value = getFormData();
+			isDirty.value = false;
+		};
+		const exposed = {
+			get errors() {
+				return form.errors;
+			},
+			get hasErrors() {
+				return form.hasErrors;
+			},
+			get processing() {
+				return form.processing;
+			},
+			get progress() {
+				return form.progress;
+			},
+			get wasSuccessful() {
+				return form.wasSuccessful;
+			},
+			get recentlySuccessful() {
+				return form.recentlySuccessful;
+			},
+			get validating() {
+				return form.validating;
+			},
+			clearErrors,
+			resetAndClearErrors,
+			setError: (fieldOrFields, maybeValue) => form.setError(typeof fieldOrFields === "string" ? { [fieldOrFields]: maybeValue } : fieldOrFields),
+			get isDirty() {
+				return isDirty.value;
+			},
+			reset,
+			submit,
+			cancel: () => form.cancel(),
+			defaults,
+			getData,
+			getFormData,
+			touch: form.touch,
+			valid: form.valid,
+			invalid: form.invalid,
+			touched: form.touched,
+			validate: (field, config4) => form.validate(...UseFormUtils.mergeHeadersForValidation(field, config4, props.headers)),
+			validator: () => form.validator()
+		};
+		expose(exposed);
+		(0, vue_exports.provide)(FormContextKey, exposed);
+		return () => {
+			return (0, vue_exports.h)("form", {
+				...attrs,
+				ref: formElement,
+				action: isUrlMethodPair(props.action) ? props.action.url : props.action,
+				method: method.value,
+				onSubmit: (event) => {
+					event.preventDefault();
+					submit(event.submitter);
+				},
+				inert: props.disableWhileProcessing && form.processing
+			}, slots.default ? slots.default(exposed) : []);
+		};
+	}
 });
-var Head = vueExports.defineComponent({
-  props: {
-    title: {
-      type: String,
-      required: false
-    }
-  },
-  data() {
-    return {
-      provider: this.$headManager.createProvider()
-    };
-  },
-  beforeUnmount() {
-    this.provider.disconnect();
-  },
-  methods: {
-    isUnaryTag(node) {
-      return typeof node.type === "string" && [
-        "area",
-        "base",
-        "br",
-        "col",
-        "embed",
-        "hr",
-        "img",
-        "input",
-        "keygen",
-        "link",
-        "meta",
-        "param",
-        "source",
-        "track",
-        "wbr"
-      ].indexOf(node.type) > -1;
-    },
-    renderTagStart(node) {
-      node.props = node.props || {};
-      node.props[this.provider.preferredAttribute()] = node.props["head-key"] !== void 0 ? node.props["head-key"] : "";
-      const attrs = Object.keys(node.props).reduce((carry, name) => {
-        const value = String(node.props[name]);
-        if (["key", "head-key"].includes(name)) {
-          return carry;
-        } else if (value === "") {
-          return carry + ` ${name}`;
-        } else {
-          return carry + ` ${name}="${escape$1(value)}"`;
-        }
-      }, "");
-      return `<${String(node.type)}${attrs}>`;
-    },
-    renderTagChildren(node) {
-      const { children } = node;
-      if (typeof children === "string") {
-        return children;
-      }
-      if (Array.isArray(children)) {
-        return children.reduce((html, child) => {
-          return html + this.renderTag(child);
-        }, "");
-      }
-      return "";
-    },
-    isFunctionNode(node) {
-      return typeof node.type === "function";
-    },
-    isComponentNode(node) {
-      return typeof node.type === "object";
-    },
-    isCommentNode(node) {
-      return /(comment|cmt)/i.test(node.type.toString());
-    },
-    isFragmentNode(node) {
-      return /(fragment|fgt|symbol\(\))/i.test(node.type.toString());
-    },
-    isTextNode(node) {
-      return /(text|txt)/i.test(node.type.toString());
-    },
-    renderTag(node) {
-      if (this.isTextNode(node)) {
-        return String(node.children);
-      } else if (this.isFragmentNode(node)) {
-        return "";
-      } else if (this.isCommentNode(node)) {
-        return "";
-      }
-      let html = this.renderTagStart(node);
-      if (node.children) {
-        html += this.renderTagChildren(node);
-      }
-      if (!this.isUnaryTag(node)) {
-        html += `</${String(node.type)}>`;
-      }
-      return html;
-    },
-    addTitleElement(elements) {
-      if (this.title && !elements.find((tag) => tag.startsWith("<title"))) {
-        elements.push(`<title ${this.provider.preferredAttribute()}>${this.title}</title>`);
-      }
-      return elements;
-    },
-    renderNodes(nodes) {
-      const elements = nodes.flatMap((node) => this.resolveNode(node)).map((node) => this.renderTag(node)).filter((node) => node);
-      return this.addTitleElement(elements);
-    },
-    resolveNode(node) {
-      if (this.isFunctionNode(node)) {
-        return this.resolveNode(node.type());
-      } else if (this.isComponentNode(node)) {
-        console.warn(`Using components in the <Head> component is not supported.`);
-        return [];
-      } else if (this.isTextNode(node) && node.children) {
-        return node;
-      } else if (this.isFragmentNode(node) && node.children) {
-        return node.children.flatMap((child) => this.resolveNode(child));
-      } else if (this.isCommentNode(node)) {
-        return [];
-      } else {
-        return node;
-      }
-    }
-  },
-  render() {
-    this.provider.update(this.renderNodes(this.$slots.default ? this.$slots.default() : []));
-  }
+function isUnaryTag(node) {
+	return typeof node.type === "string" && [
+		"area",
+		"base",
+		"br",
+		"col",
+		"embed",
+		"hr",
+		"img",
+		"input",
+		"keygen",
+		"link",
+		"meta",
+		"param",
+		"source",
+		"track",
+		"wbr"
+	].indexOf(node.type) > -1;
+}
+function renderTagStart(node) {
+	node.props = node.props || {};
+	node.props["data-inertia"] = node.props["head-key"] !== void 0 ? node.props["head-key"] : "";
+	const attrs = Object.keys(node.props).reduce((carry, name) => {
+		const value = String(node.props[name]);
+		if (["key", "head-key"].includes(name)) return carry;
+		else if (value === "") return carry + ` ${name}`;
+		else return carry + ` ${name}="${escape(value)}"`;
+	}, "");
+	return `<${String(node.type)}${attrs}>`;
+}
+function renderTagChildren(node) {
+	const { children } = node;
+	if (typeof children === "string") return children;
+	if (Array.isArray(children)) return children.reduce((html, child) => {
+		return html + renderTag(child);
+	}, "");
+	return "";
+}
+function isFunctionNode(node) {
+	return typeof node.type === "function";
+}
+function isComponentNode(node) {
+	return typeof node.type === "object";
+}
+function isCommentNode(node) {
+	return /(comment|cmt)/i.test(node.type.toString());
+}
+function isFragmentNode(node) {
+	return /(fragment|fgt|symbol\(\))/i.test(node.type.toString());
+}
+function isTextNode(node) {
+	return /(text|txt)/i.test(node.type.toString());
+}
+function renderTag(node) {
+	if (isTextNode(node)) return String(node.children);
+	else if (isFragmentNode(node)) return "";
+	else if (isCommentNode(node)) return "";
+	let html = renderTagStart(node);
+	if (node.children) html += renderTagChildren(node);
+	if (!isUnaryTag(node)) html += `</${String(node.type)}>`;
+	return html;
+}
+function addTitleElement(elements, title) {
+	if (title && !elements.find((tag) => tag.startsWith("<title"))) elements.push(`<title data-inertia="">${escape(title)}</title>`);
+	return elements;
+}
+function renderNodes(nodes, title) {
+	return addTitleElement(nodes.flatMap((node) => resolveNode(node)).map((node) => renderTag(node)).filter((node) => node), title);
+}
+function resolveNode(node) {
+	if (isFunctionNode(node)) return resolveNode(node.type());
+	else if (isComponentNode(node)) {
+		console.warn(`Using components in the <Head> component is not supported.`);
+		return [];
+	} else if (isTextNode(node) && node.children) return node;
+	else if (isFragmentNode(node) && node.children) return node.children.flatMap((child) => resolveNode(child));
+	else if (isCommentNode(node)) return [];
+	else return node;
+}
+var head_default = (0, vue_exports.defineComponent)({
+	props: { title: {
+		type: String,
+		required: false
+	} },
+	setup(props, { slots }) {
+		const provider = headManager.createProvider();
+		(0, vue_exports.onBeforeUnmount)(() => {
+			provider.disconnect();
+		});
+		return () => {
+			provider.update(renderNodes(slots.default ? slots.default() : [], props.title));
+		};
+	}
 });
-var head_default = Head;
 var resolveHTMLElement = (value, fallback) => {
-  if (!value) {
-    return fallback;
-  }
-  if (typeof value === "string") {
-    return document.querySelector(value);
-  }
-  if (typeof value === "function") {
-    return value() || null;
-  }
-  return fallback;
+	if (!value) return fallback;
+	if (typeof value === "string") return document.querySelector(value);
+	if (typeof value === "function") return value() || null;
+	return fallback;
 };
-vueExports.defineComponent({
-  name: "InfiniteScroll",
-  slots: Object,
-  props: {
-    data: {
-      type: String,
-      required: true
-    },
-    buffer: {
-      type: Number,
-      default: 0
-    },
-    onlyNext: {
-      type: Boolean,
-      default: false
-    },
-    onlyPrevious: {
-      type: Boolean,
-      default: false
-    },
-    as: {
-      type: String,
-      default: "div"
-    },
-    manual: {
-      type: Boolean,
-      default: false
-    },
-    manualAfter: {
-      type: Number,
-      default: 0
-    },
-    preserveUrl: {
-      type: Boolean,
-      default: false
-    },
-    reverse: {
-      type: Boolean,
-      default: false
-    },
-    autoScroll: {
-      type: Boolean,
-      default: void 0
-    },
-    itemsElement: {
-      type: [String, Function, Object],
-      default: null
-    },
-    startElement: {
-      type: [String, Function, Object],
-      default: null
-    },
-    endElement: {
-      type: [String, Function, Object],
-      default: null
-    }
-  },
-  inheritAttrs: false,
-  setup(props, { slots, attrs, expose }) {
-    const itemsElementRef = vueExports.ref(null);
-    const startElementRef = vueExports.ref(null);
-    const endElementRef = vueExports.ref(null);
-    const itemsElement = vueExports.computed(
-      () => resolveHTMLElement(props.itemsElement, itemsElementRef.value)
-    );
-    const scrollableParent = vueExports.computed(() => getScrollableParent(itemsElement.value));
-    const startElement = vueExports.computed(
-      () => resolveHTMLElement(props.startElement, startElementRef.value)
-    );
-    const endElement = vueExports.computed(() => resolveHTMLElement(props.endElement, endElementRef.value));
-    const loadingPrevious = vueExports.ref(false);
-    const loadingNext = vueExports.ref(false);
-    const requestCount = vueExports.ref(0);
-    const hasPreviousPage = vueExports.ref(false);
-    const hasNextPage = vueExports.ref(false);
-    const syncStateFromDataManager = () => {
-      requestCount.value = dataManager.getRequestCount();
-      hasPreviousPage.value = dataManager.hasPrevious();
-      hasNextPage.value = dataManager.hasNext();
-    };
-    const {
-      dataManager,
-      elementManager,
-      flush: flushInfiniteScroll
-    } = useInfiniteScroll({
-      // Data
-      getPropName: () => props.data,
-      inReverseMode: () => props.reverse,
-      shouldFetchNext: () => !props.onlyPrevious,
-      shouldFetchPrevious: () => !props.onlyNext,
-      shouldPreserveUrl: () => props.preserveUrl,
-      // Elements
-      getTriggerMargin: () => props.buffer,
-      getStartElement: () => startElement.value,
-      getEndElement: () => endElement.value,
-      getItemsElement: () => itemsElement.value,
-      getScrollableParent: () => scrollableParent.value,
-      // Request callbacks
-      onBeforePreviousRequest: () => loadingPrevious.value = true,
-      onBeforeNextRequest: () => loadingNext.value = true,
-      onCompletePreviousRequest: () => {
-        loadingPrevious.value = false;
-        syncStateFromDataManager();
-      },
-      onCompleteNextRequest: () => {
-        loadingNext.value = false;
-        syncStateFromDataManager();
-      },
-      onDataReset: syncStateFromDataManager
-    });
-    syncStateFromDataManager();
-    const autoLoad = vueExports.computed(() => !manualMode.value);
-    const manualMode = vueExports.computed(
-      () => props.manual || props.manualAfter > 0 && requestCount.value >= props.manualAfter
-    );
-    const scrollToBottom = () => {
-      if (scrollableParent.value) {
-        scrollableParent.value.scrollTo({
-          top: scrollableParent.value.scrollHeight,
-          behavior: "instant"
-        });
-      } else {
-        window.scrollTo({
-          top: document.body.scrollHeight,
-          behavior: "instant"
-        });
-      }
-    };
-    vueExports.onMounted(() => {
-      elementManager.setupObservers();
-      elementManager.processServerLoadedElements(dataManager.getLastLoadedPage());
-      const shouldAutoScroll = props.autoScroll !== void 0 ? props.autoScroll : props.reverse;
-      if (shouldAutoScroll) {
-        scrollToBottom();
-      }
-      if (autoLoad.value) {
-        elementManager.enableTriggers();
-      }
-    });
-    vueExports.onUnmounted(flushInfiniteScroll);
-    vueExports.watch(
-      () => [autoLoad.value, props.onlyNext, props.onlyPrevious],
-      ([enabled]) => {
-        enabled ? elementManager.enableTriggers() : elementManager.disableTriggers();
-      }
-    );
-    expose({
-      fetchNext: dataManager.fetchNext,
-      fetchPrevious: dataManager.fetchPrevious,
-      hasPrevious: dataManager.hasPrevious,
-      hasNext: dataManager.hasNext
-    });
-    return () => {
-      var _a, _b, _c;
-      const renderElements = [];
-      const sharedExposed = {
-        loadingPrevious: loadingPrevious.value,
-        loadingNext: loadingNext.value,
-        hasPrevious: hasPreviousPage.value,
-        hasNext: hasNextPage.value
-      };
-      if (!props.startElement) {
-        const headerAutoMode = autoLoad.value && !props.onlyNext;
-        const exposedPrevious = {
-          loading: loadingPrevious.value,
-          fetch: dataManager.fetchPrevious,
-          autoMode: headerAutoMode,
-          manualMode: !headerAutoMode,
-          hasMore: hasPreviousPage.value,
-          ...sharedExposed
-        };
-        renderElements.push(
-          vueExports.h(
-            "div",
-            { ref: startElementRef },
-            slots.previous ? slots.previous(exposedPrevious) : loadingPrevious.value ? (_a = slots.loading) == null ? void 0 : _a.call(slots, exposedPrevious) : void 0
-          )
-        );
-      }
-      renderElements.push(
-        vueExports.h(
-          props.as,
-          { ...attrs, ref: itemsElementRef },
-          (_b = slots.default) == null ? void 0 : _b.call(slots, {
-            loading: loadingPrevious.value || loadingNext.value,
-            loadingPrevious: loadingPrevious.value,
-            loadingNext: loadingNext.value
-          })
-        )
-      );
-      if (!props.endElement) {
-        const footerAutoMode = autoLoad.value && !props.onlyPrevious;
-        const exposedNext = {
-          loading: loadingNext.value,
-          fetch: dataManager.fetchNext,
-          autoMode: footerAutoMode,
-          manualMode: !footerAutoMode,
-          hasMore: hasNextPage.value,
-          ...sharedExposed
-        };
-        renderElements.push(
-          vueExports.h(
-            "div",
-            { ref: endElementRef },
-            slots.next ? slots.next(exposedNext) : loadingNext.value ? (_c = slots.loading) == null ? void 0 : _c.call(slots, exposedNext) : void 0
-          )
-        );
-      }
-      return vueExports.h(vueExports.Fragment, {}, props.reverse ? [...renderElements].reverse() : renderElements);
-    };
-  }
+(0, vue_exports.defineComponent)({
+	name: "InfiniteScroll",
+	slots: Object,
+	props: {
+		data: {
+			type: String,
+			required: true
+		},
+		buffer: {
+			type: Number,
+			default: 0
+		},
+		onlyNext: {
+			type: Boolean,
+			default: false
+		},
+		onlyPrevious: {
+			type: Boolean,
+			default: false
+		},
+		as: {
+			type: String,
+			default: "div"
+		},
+		manual: {
+			type: Boolean,
+			default: false
+		},
+		manualAfter: {
+			type: Number,
+			default: 0
+		},
+		preserveUrl: {
+			type: Boolean,
+			default: false
+		},
+		reverse: {
+			type: Boolean,
+			default: false
+		},
+		autoScroll: {
+			type: Boolean,
+			default: void 0
+		},
+		itemsElement: {
+			type: [
+				String,
+				Function,
+				Object
+			],
+			default: null
+		},
+		startElement: {
+			type: [
+				String,
+				Function,
+				Object
+			],
+			default: null
+		},
+		endElement: {
+			type: [
+				String,
+				Function,
+				Object
+			],
+			default: null
+		},
+		params: {
+			type: Object,
+			default: () => ({})
+		}
+	},
+	inheritAttrs: false,
+	setup(props, { slots, attrs, expose }) {
+		const itemsElementRef = (0, vue_exports.ref)(null);
+		const startElementRef = (0, vue_exports.ref)(null);
+		const endElementRef = (0, vue_exports.ref)(null);
+		const itemsElement = (0, vue_exports.computed)(() => resolveHTMLElement(props.itemsElement, itemsElementRef.value));
+		const scrollableParent = (0, vue_exports.computed)(() => getScrollableParent(itemsElement.value));
+		const startElement = (0, vue_exports.computed)(() => resolveHTMLElement(props.startElement, startElementRef.value));
+		const endElement = (0, vue_exports.computed)(() => resolveHTMLElement(props.endElement, endElementRef.value));
+		const loadingPrevious = (0, vue_exports.ref)(false);
+		const loadingNext = (0, vue_exports.ref)(false);
+		const requestCount = (0, vue_exports.ref)(0);
+		const hasPreviousPage = (0, vue_exports.ref)(false);
+		const hasNextPage = (0, vue_exports.ref)(false);
+		const syncStateFromDataManager = () => {
+			requestCount.value = dataManager.getRequestCount();
+			hasPreviousPage.value = dataManager.hasPrevious();
+			hasNextPage.value = dataManager.hasNext();
+		};
+		const { dataManager, elementManager, flush: flushInfiniteScroll } = useInfiniteScroll({
+			getPropName: () => props.data,
+			inReverseMode: () => props.reverse,
+			shouldFetchNext: () => !props.onlyPrevious,
+			shouldFetchPrevious: () => !props.onlyNext,
+			shouldPreserveUrl: () => props.preserveUrl,
+			getReloadOptions: () => props.params,
+			getTriggerMargin: () => props.buffer,
+			getStartElement: () => startElement.value,
+			getEndElement: () => endElement.value,
+			getItemsElement: () => itemsElement.value,
+			getScrollableParent: () => scrollableParent.value,
+			onBeforePreviousRequest: () => loadingPrevious.value = true,
+			onBeforeNextRequest: () => loadingNext.value = true,
+			onCompletePreviousRequest: ({ completed }) => {
+				loadingPrevious.value = false;
+				if (completed) syncStateFromDataManager();
+			},
+			onCompleteNextRequest: ({ completed }) => {
+				loadingNext.value = false;
+				if (completed) syncStateFromDataManager();
+			},
+			onDataReset: syncStateFromDataManager
+		});
+		syncStateFromDataManager();
+		if (typeof window === "undefined") {
+			const scrollProp = usePage().scrollProps?.[props.data];
+			if (scrollProp) {
+				hasPreviousPage.value = !!scrollProp.previousPage;
+				hasNextPage.value = !!scrollProp.nextPage;
+			}
+		}
+		const autoLoad = (0, vue_exports.computed)(() => !manualMode.value);
+		const manualMode = (0, vue_exports.computed)(() => props.manual || props.manualAfter > 0 && requestCount.value >= props.manualAfter);
+		const scrollToBottom = () => {
+			if (scrollableParent.value) scrollableParent.value.scrollTo({
+				top: scrollableParent.value.scrollHeight,
+				behavior: "instant"
+			});
+			else window.scrollTo({
+				top: document.body.scrollHeight,
+				behavior: "instant"
+			});
+		};
+		(0, vue_exports.onMounted)(() => {
+			elementManager.setupObservers();
+			elementManager.processServerLoadedElements(dataManager.getLastLoadedPage());
+			if (props.autoScroll !== void 0 ? props.autoScroll : props.reverse) scrollToBottom();
+			if (autoLoad.value) elementManager.enableTriggers();
+		});
+		(0, vue_exports.onUnmounted)(flushInfiniteScroll);
+		(0, vue_exports.watch)(() => [
+			autoLoad.value,
+			props.onlyNext,
+			props.onlyPrevious
+		], ([enabled]) => {
+			enabled ? elementManager.enableTriggers() : elementManager.disableTriggers();
+		});
+		expose({
+			fetchNext: dataManager.fetchNext,
+			fetchPrevious: dataManager.fetchPrevious,
+			hasPrevious: dataManager.hasPrevious,
+			hasNext: dataManager.hasNext
+		});
+		return () => {
+			const renderElements = [];
+			const sharedExposed = {
+				loadingPrevious: loadingPrevious.value,
+				loadingNext: loadingNext.value,
+				hasPrevious: hasPreviousPage.value,
+				hasNext: hasNextPage.value
+			};
+			if (!props.startElement) {
+				const headerAutoMode = autoLoad.value && !props.onlyNext;
+				const exposedPrevious = {
+					loading: loadingPrevious.value,
+					fetch: dataManager.fetchPrevious,
+					autoMode: headerAutoMode,
+					manualMode: !headerAutoMode,
+					hasMore: hasPreviousPage.value,
+					...sharedExposed
+				};
+				renderElements.push((0, vue_exports.h)("div", { ref: startElementRef }, slots.previous ? slots.previous(exposedPrevious) : loadingPrevious.value ? slots.loading?.(exposedPrevious) : void 0));
+			}
+			renderElements.push((0, vue_exports.h)(props.as, {
+				...attrs,
+				ref: itemsElementRef
+			}, slots.default?.({
+				loading: loadingPrevious.value || loadingNext.value,
+				loadingPrevious: loadingPrevious.value,
+				loadingNext: loadingNext.value
+			})));
+			if (!props.endElement) {
+				const footerAutoMode = autoLoad.value && !props.onlyPrevious;
+				const exposedNext = {
+					loading: loadingNext.value,
+					fetch: dataManager.fetchNext,
+					autoMode: footerAutoMode,
+					manualMode: !footerAutoMode,
+					hasMore: hasNextPage.value,
+					...sharedExposed
+				};
+				renderElements.push((0, vue_exports.h)("div", { ref: endElementRef }, slots.next ? slots.next(exposedNext) : loadingNext.value ? slots.loading?.(exposedNext) : void 0));
+			}
+			return (0, vue_exports.h)(vue_exports.Fragment, {}, props.reverse ? [...renderElements].reverse() : renderElements);
+		};
+	}
 });
-var noop2 = () => {
-};
-var Link = vueExports.defineComponent({
-  name: "Link",
-  props: {
-    as: {
-      type: [String, Object],
-      default: "a"
-    },
-    data: {
-      type: Object,
-      default: () => ({})
-    },
-    href: {
-      type: [String, Object],
-      default: ""
-    },
-    method: {
-      type: String,
-      default: "get"
-    },
-    replace: {
-      type: Boolean,
-      default: false
-    },
-    preserveScroll: {
-      type: [Boolean, String, Function],
-      default: false
-    },
-    preserveState: {
-      type: [Boolean, String, Function],
-      default: null
-    },
-    preserveUrl: {
-      type: Boolean,
-      default: false
-    },
-    only: {
-      type: Array,
-      default: () => []
-    },
-    except: {
-      type: Array,
-      default: () => []
-    },
-    headers: {
-      type: Object,
-      default: () => ({})
-    },
-    queryStringArrayFormat: {
-      type: String,
-      default: "brackets"
-    },
-    async: {
-      type: Boolean,
-      default: false
-    },
-    prefetch: {
-      type: [Boolean, String, Array],
-      default: false
-    },
-    cacheFor: {
-      type: [Number, String, Array],
-      default: 0
-    },
-    onStart: {
-      type: Function,
-      default: noop2
-    },
-    onProgress: {
-      type: Function,
-      default: noop2
-    },
-    onFinish: {
-      type: Function,
-      default: noop2
-    },
-    onBefore: {
-      type: Function,
-      default: noop2
-    },
-    onCancel: {
-      type: Function,
-      default: noop2
-    },
-    onSuccess: {
-      type: Function,
-      default: noop2
-    },
-    onError: {
-      type: Function,
-      default: noop2
-    },
-    onCancelToken: {
-      type: Function,
-      default: noop2
-    },
-    onPrefetching: {
-      type: Function,
-      default: noop2
-    },
-    onPrefetched: {
-      type: Function,
-      default: noop2
-    },
-    cacheTags: {
-      type: [String, Array],
-      default: () => []
-    },
-    viewTransition: {
-      type: [Boolean, Object],
-      default: false
-    }
-  },
-  setup(props, { slots, attrs }) {
-    const inFlightCount = vueExports.ref(0);
-    const hoverTimeout = vueExports.ref();
-    const prefetchModes = vueExports.computed(() => {
-      if (props.prefetch === true) {
-        return ["hover"];
-      }
-      if (props.prefetch === false) {
-        return [];
-      }
-      if (Array.isArray(props.prefetch)) {
-        return props.prefetch;
-      }
-      return [props.prefetch];
-    });
-    const cacheForValue = vueExports.computed(() => {
-      if (props.cacheFor !== 0) {
-        return props.cacheFor;
-      }
-      if (prefetchModes.value.length === 1 && prefetchModes.value[0] === "click") {
-        return 0;
-      }
-      return config.get("prefetch.cacheFor");
-    });
-    vueExports.onMounted(() => {
-      if (prefetchModes.value.includes("mount")) {
-        prefetch();
-      }
-    });
-    vueExports.onUnmounted(() => {
-      clearTimeout(hoverTimeout.value);
-    });
-    const method = vueExports.computed(
-      () => isUrlMethodPair(props.href) ? props.href.method : (props.method ?? "get").toLowerCase()
-    );
-    const as = vueExports.computed(() => {
-      if (typeof props.as !== "string" || props.as.toLowerCase() !== "a") {
-        return props.as;
-      }
-      return method.value !== "get" ? "button" : props.as.toLowerCase();
-    });
-    const mergeDataArray = vueExports.computed(
-      () => mergeDataIntoQueryString(
-        method.value,
-        isUrlMethodPair(props.href) ? props.href.url : props.href,
-        props.data || {},
-        props.queryStringArrayFormat
-      )
-    );
-    const href = vueExports.computed(() => mergeDataArray.value[0]);
-    const data = vueExports.computed(() => mergeDataArray.value[1]);
-    const elProps = vueExports.computed(() => {
-      if (as.value === "button") {
-        return { type: "button" };
-      }
-      if (as.value === "a" || typeof as.value !== "string") {
-        return { href: href.value };
-      }
-      return {};
-    });
-    const baseParams = vueExports.computed(() => ({
-      data: data.value,
-      method: method.value,
-      replace: props.replace,
-      preserveScroll: props.preserveScroll,
-      preserveState: props.preserveState ?? method.value !== "get",
-      preserveUrl: props.preserveUrl,
-      only: props.only,
-      except: props.except,
-      headers: props.headers,
-      async: props.async
-    }));
-    const visitParams = vueExports.computed(() => ({
-      ...baseParams.value,
-      viewTransition: props.viewTransition,
-      onCancelToken: props.onCancelToken,
-      onBefore: props.onBefore,
-      onStart: (visit) => {
-        var _a;
-        inFlightCount.value++;
-        (_a = props.onStart) == null ? void 0 : _a.call(props, visit);
-      },
-      onProgress: props.onProgress,
-      onFinish: (visit) => {
-        var _a;
-        inFlightCount.value--;
-        (_a = props.onFinish) == null ? void 0 : _a.call(props, visit);
-      },
-      onCancel: props.onCancel,
-      onSuccess: props.onSuccess,
-      onError: props.onError
-    }));
-    const prefetch = () => {
-      router.prefetch(
-        href.value,
-        {
-          ...baseParams.value,
-          onPrefetching: props.onPrefetching,
-          onPrefetched: props.onPrefetched
-        },
-        {
-          cacheFor: cacheForValue.value,
-          cacheTags: props.cacheTags
-        }
-      );
-    };
-    const regularEvents = {
-      onClick: (event) => {
-        if (shouldIntercept(event)) {
-          event.preventDefault();
-          router.visit(href.value, visitParams.value);
-        }
-      }
-    };
-    const prefetchHoverEvents = {
-      onMouseenter: () => {
-        hoverTimeout.value = setTimeout(() => {
-          prefetch();
-        }, config.get("prefetch.hoverDelay"));
-      },
-      onMouseleave: () => {
-        clearTimeout(hoverTimeout.value);
-      },
-      onClick: regularEvents.onClick
-    };
-    const prefetchClickEvents = {
-      onMousedown: (event) => {
-        if (shouldIntercept(event)) {
-          event.preventDefault();
-          prefetch();
-        }
-      },
-      onKeydown: (event) => {
-        if (shouldNavigate(event)) {
-          event.preventDefault();
-          prefetch();
-        }
-      },
-      onMouseup: (event) => {
-        if (shouldIntercept(event)) {
-          event.preventDefault();
-          router.visit(href.value, visitParams.value);
-        }
-      },
-      onKeyup: (event) => {
-        if (shouldNavigate(event)) {
-          event.preventDefault();
-          router.visit(href.value, visitParams.value);
-        }
-      },
-      onClick: (event) => {
-        if (shouldIntercept(event)) {
-          event.preventDefault();
-        }
-      }
-    };
-    return () => {
-      return vueExports.h(
-        as.value,
-        {
-          ...attrs,
-          ...elProps.value,
-          "data-loading": inFlightCount.value > 0 ? "" : void 0,
-          ...(() => {
-            if (prefetchModes.value.includes("hover")) {
-              return prefetchHoverEvents;
-            }
-            if (prefetchModes.value.includes("click")) {
-              return prefetchClickEvents;
-            }
-            return regularEvents;
-          })()
-        },
-        slots
-      );
-    };
-  }
+var noop2 = () => {};
+var link_default = (0, vue_exports.defineComponent)({
+	name: "Link",
+	props: {
+		as: {
+			type: [String, Object],
+			default: "a"
+		},
+		data: {
+			type: Object,
+			default: () => ({})
+		},
+		href: {
+			type: [String, Object],
+			default: ""
+		},
+		method: {
+			type: String,
+			default: "get"
+		},
+		replace: {
+			type: Boolean,
+			default: false
+		},
+		preserveScroll: {
+			type: [
+				Boolean,
+				String,
+				Function
+			],
+			default: false
+		},
+		preserveState: {
+			type: [
+				Boolean,
+				String,
+				Function
+			],
+			default: null
+		},
+		preserveUrl: {
+			type: Boolean,
+			default: false
+		},
+		only: {
+			type: Array,
+			default: () => []
+		},
+		except: {
+			type: Array,
+			default: () => []
+		},
+		headers: {
+			type: Object,
+			default: () => ({})
+		},
+		queryStringArrayFormat: {
+			type: String,
+			default: "brackets"
+		},
+		async: {
+			type: Boolean,
+			default: false
+		},
+		prefetch: {
+			type: [
+				Boolean,
+				String,
+				Array
+			],
+			default: false
+		},
+		cacheFor: {
+			type: [
+				Number,
+				String,
+				Array
+			],
+			default: 0
+		},
+		onStart: {
+			type: Function,
+			default: noop2
+		},
+		onProgress: {
+			type: Function,
+			default: noop2
+		},
+		onFinish: {
+			type: Function,
+			default: noop2
+		},
+		onBefore: {
+			type: Function,
+			default: noop2
+		},
+		onCancel: {
+			type: Function,
+			default: noop2
+		},
+		onSuccess: {
+			type: Function,
+			default: noop2
+		},
+		onHttpException: {
+			type: Function,
+			default: noop2
+		},
+		onNetworkError: {
+			type: Function,
+			default: noop2
+		},
+		onFlash: {
+			type: Function,
+			default: noop2
+		},
+		onError: {
+			type: Function,
+			default: noop2
+		},
+		onCancelToken: {
+			type: Function,
+			default: noop2
+		},
+		onPrefetching: {
+			type: Function,
+			default: noop2
+		},
+		onPrefetched: {
+			type: Function,
+			default: noop2
+		},
+		cacheTags: {
+			type: [String, Array],
+			default: () => []
+		},
+		viewTransition: {
+			type: [Boolean, Object],
+			default: false
+		},
+		component: {
+			type: String,
+			default: null
+		},
+		instant: {
+			type: Boolean,
+			default: false
+		},
+		pageProps: {
+			type: [Object, Function],
+			default: null
+		}
+	},
+	setup(props, { slots, attrs }) {
+		const inFlightCount = (0, vue_exports.ref)(0);
+		const hoverTimeout = (0, vue_exports.ref)();
+		const prefetchModes = (0, vue_exports.computed)(() => {
+			if (props.prefetch === true) return ["hover"];
+			if (props.prefetch === false) return [];
+			if (Array.isArray(props.prefetch)) return props.prefetch;
+			return [props.prefetch];
+		});
+		const cacheForValue = (0, vue_exports.computed)(() => {
+			if (props.cacheFor !== 0) return props.cacheFor;
+			if (prefetchModes.value.length === 1 && prefetchModes.value[0] === "click") return 0;
+			return config$1.get("prefetch.cacheFor");
+		});
+		(0, vue_exports.onMounted)(() => {
+			if (prefetchModes.value.includes("mount")) prefetch();
+		});
+		(0, vue_exports.onUnmounted)(() => {
+			clearTimeout(hoverTimeout.value);
+		});
+		const method = (0, vue_exports.computed)(() => isUrlMethodPair(props.href) ? props.href.method : (props.method ?? "get").toLowerCase());
+		const as = (0, vue_exports.computed)(() => {
+			if (typeof props.as !== "string" || props.as.toLowerCase() !== "a") return props.as;
+			return method.value !== "get" ? "button" : props.as.toLowerCase();
+		});
+		const mergeDataArray = (0, vue_exports.computed)(() => mergeDataIntoQueryString(method.value, isUrlMethodPair(props.href) ? props.href.url : props.href, props.data || {}, props.queryStringArrayFormat));
+		const href = (0, vue_exports.computed)(() => mergeDataArray.value[0]);
+		const data = (0, vue_exports.computed)(() => mergeDataArray.value[1]);
+		const resolvedComponent = (0, vue_exports.computed)(() => {
+			if (props.component) return props.component;
+			if (props.instant && isUrlMethodPair(props.href)) return resolveUrlMethodPairComponent(props.href);
+			return null;
+		});
+		const elProps = (0, vue_exports.computed)(() => {
+			if (as.value === "button") return { type: "button" };
+			if (as.value === "a" || typeof as.value !== "string") return { href: href.value };
+			return {};
+		});
+		const baseParams = (0, vue_exports.computed)(() => ({
+			data: data.value,
+			method: method.value,
+			replace: props.replace,
+			preserveScroll: props.preserveScroll,
+			preserveState: props.preserveState ?? method.value !== "get",
+			preserveUrl: props.preserveUrl,
+			only: props.only,
+			except: props.except,
+			headers: props.headers,
+			async: props.async,
+			component: resolvedComponent.value,
+			pageProps: props.pageProps
+		}));
+		const visitParams = (0, vue_exports.computed)(() => ({
+			...baseParams.value,
+			viewTransition: props.viewTransition,
+			onCancelToken: props.onCancelToken,
+			onBefore: props.onBefore,
+			onStart: (visit) => {
+				inFlightCount.value++;
+				props.onStart?.(visit);
+			},
+			onProgress: props.onProgress,
+			onFinish: (visit) => {
+				inFlightCount.value--;
+				props.onFinish?.(visit);
+			},
+			onCancel: props.onCancel,
+			onSuccess: props.onSuccess,
+			onError: props.onError,
+			onHttpException: props.onHttpException,
+			onNetworkError: props.onNetworkError,
+			onFlash: props.onFlash
+		}));
+		const prefetch = () => {
+			router.prefetch(href.value, {
+				...baseParams.value,
+				onPrefetching: props.onPrefetching,
+				onPrefetched: props.onPrefetched
+			}, {
+				cacheFor: cacheForValue.value,
+				cacheTags: props.cacheTags
+			});
+		};
+		const regularEvents = { onClick: (event) => {
+			if (shouldIntercept(event)) {
+				event.preventDefault();
+				router.visit(href.value, visitParams.value);
+			}
+		} };
+		const prefetchHoverEvents = {
+			onMouseenter: () => {
+				hoverTimeout.value = setTimeout(() => {
+					prefetch();
+				}, config$1.get("prefetch.hoverDelay"));
+			},
+			onMouseleave: () => {
+				clearTimeout(hoverTimeout.value);
+			},
+			onClick: (event) => {
+				clearTimeout(hoverTimeout.value);
+				regularEvents.onClick(event);
+			}
+		};
+		const prefetchClickEvents = {
+			onMousedown: (event) => {
+				if (shouldIntercept(event)) {
+					event.preventDefault();
+					prefetch();
+				}
+			},
+			onKeydown: (event) => {
+				if (shouldNavigate(event)) {
+					event.preventDefault();
+					prefetch();
+				}
+			},
+			onMouseup: (event) => {
+				if (shouldIntercept(event)) {
+					event.preventDefault();
+					router.visit(href.value, visitParams.value);
+				}
+			},
+			onKeyup: (event) => {
+				if (shouldNavigate(event)) {
+					event.preventDefault();
+					router.visit(href.value, visitParams.value);
+				}
+			},
+			onClick: (event) => {
+				if (shouldIntercept(event)) event.preventDefault();
+			}
+		};
+		return () => {
+			return (0, vue_exports.h)(as.value, {
+				...attrs,
+				...elProps.value,
+				"data-loading": inFlightCount.value > 0 ? "" : void 0,
+				...(() => {
+					if (prefetchModes.value.includes("hover")) return prefetchHoverEvents;
+					if (prefetchModes.value.includes("click")) return prefetchClickEvents;
+					return regularEvents;
+				})()
+			}, slots);
+		};
+	}
 });
-var link_default = Link;
-var whenVisible_default = vueExports.defineComponent({
-  name: "WhenVisible",
-  slots: Object,
-  props: {
-    data: {
-      type: [String, Array]
-    },
-    params: {
-      type: Object
-    },
-    buffer: {
-      type: Number,
-      default: 0
-    },
-    as: {
-      type: String,
-      default: "div"
-    },
-    always: {
-      type: Boolean,
-      default: false
-    }
-  },
-  data() {
-    return {
-      loaded: false,
-      fetching: false,
-      observer: null
-    };
-  },
-  unmounted() {
-    var _a;
-    (_a = this.observer) == null ? void 0 : _a.disconnect();
-  },
-  computed: {
-    keys() {
-      return this.data ? Array.isArray(this.data) ? this.data : [this.data] : [];
-    }
-  },
-  created() {
-    const page2 = usePage();
-    this.$watch(
-      () => this.keys.map((key2) => page2.props[key2]),
-      () => {
-        const exists = this.keys.length > 0 && this.keys.every((key2) => page2.props[key2] !== void 0);
-        this.loaded = exists;
-        if (exists && !this.always) {
-          return;
-        }
-        if (!this.observer || !exists) {
-          this.$nextTick(this.registerObserver);
-        }
-      },
-      { immediate: true }
-    );
-  },
-  methods: {
-    registerObserver() {
-      var _a;
-      (_a = this.observer) == null ? void 0 : _a.disconnect();
-      this.observer = new IntersectionObserver(
-        (entries) => {
-          if (!entries[0].isIntersecting) {
-            return;
-          }
-          if (this.fetching) {
-            return;
-          }
-          if (!this.always && this.loaded) {
-            return;
-          }
-          this.fetching = true;
-          const reloadParams = this.getReloadParams();
-          router.reload({
-            ...reloadParams,
-            onStart: (e2) => {
-              var _a2;
-              this.fetching = true;
-              (_a2 = reloadParams.onStart) == null ? void 0 : _a2.call(reloadParams, e2);
-            },
-            onFinish: (e2) => {
-              var _a2, _b;
-              this.loaded = true;
-              this.fetching = false;
-              (_a2 = reloadParams.onFinish) == null ? void 0 : _a2.call(reloadParams, e2);
-              if (!this.always) {
-                (_b = this.observer) == null ? void 0 : _b.disconnect();
-              }
-            }
-          });
-        },
-        {
-          rootMargin: `${this.$props.buffer}px`
-        }
-      );
-      this.observer.observe(this.$el.nextSibling);
-    },
-    getReloadParams() {
-      const reloadParams = { ...this.$props.params };
-      if (this.$props.data) {
-        reloadParams.only = Array.isArray(this.$props.data) ? this.$props.data : [this.$props.data];
-      }
-      return reloadParams;
-    }
-  },
-  render() {
-    const els = [];
-    if (this.$props.always || !this.loaded) {
-      els.push(vueExports.h(this.$props.as));
-    }
-    if (!this.loaded) {
-      els.push(this.$slots.fallback ? this.$slots.fallback({}) : null);
-    } else if (this.$slots.default) {
-      els.push(this.$slots.default({ fetching: this.fetching }));
-    }
-    return els;
-  }
+(0, vue_exports.defineComponent)({
+	name: "WhenMounted",
+	slots: Object,
+	setup(_, { slots }) {
+		const hydrated = injectHydrationContext();
+		const mounted = (0, vue_exports.ref)(hydrated?.value ?? false);
+		(0, vue_exports.onMounted)(() => {
+			mounted.value = true;
+		});
+		return () => {
+			if (!mounted.value) return (0, vue_exports.h)(vue_exports.Fragment, { key: "fallback" }, slots.fallback?.({}) ?? []);
+			return (0, vue_exports.h)(vue_exports.Fragment, { key: "default" }, slots.default?.({}) ?? []);
+		};
+	}
 });
-var config = config$1.extend({});
-var serverRenderer_cjs_prod = {};
+var whenVisible_default = (0, vue_exports.defineComponent)({
+	name: "WhenVisible",
+	slots: Object,
+	props: {
+		data: { type: [String, Array] },
+		params: { type: Object },
+		buffer: {
+			type: Number,
+			default: 0
+		},
+		as: {
+			type: String,
+			default: "div"
+		},
+		always: {
+			type: Boolean,
+			default: false
+		}
+	},
+	setup(props, { slots }) {
+		const loaded = (0, vue_exports.ref)(false);
+		const fetching = (0, vue_exports.ref)(false);
+		const observer = (0, vue_exports.ref)(null);
+		const elementRef = (0, vue_exports.ref)(null);
+		const page2 = usePage();
+		const keys = (0, vue_exports.computed)(() => {
+			return props.data ? Array.isArray(props.data) ? props.data : [props.data] : [];
+		});
+		function getReloadParams() {
+			const reloadParams = {
+				preserveErrors: true,
+				...props.params
+			};
+			if (props.data) reloadParams.only = Array.isArray(props.data) ? props.data : [props.data];
+			return reloadParams;
+		}
+		function registerObserver() {
+			if (typeof window === "undefined") return;
+			observer.value?.disconnect();
+			observer.value = new IntersectionObserver((entries) => {
+				if (!entries[0].isIntersecting) return;
+				if (fetching.value) return;
+				if (!props.always && loaded.value) return;
+				fetching.value = true;
+				const reloadParams = getReloadParams();
+				router.reload({
+					...reloadParams,
+					onStart: (e) => {
+						fetching.value = true;
+						reloadParams.onStart?.(e);
+					},
+					onFinish: (e) => {
+						loaded.value = true;
+						fetching.value = false;
+						reloadParams.onFinish?.(e);
+						if (!props.always) observer.value?.disconnect();
+					}
+				});
+			}, { rootMargin: `${props.buffer}px` });
+			if (elementRef.value) observer.value.observe(elementRef.value);
+		}
+		(0, vue_exports.watch)(() => keys.value.map((key2) => get(page2.props, key2)), () => {
+			const exists = keys.value.length > 0 && keys.value.every((key2) => get(page2.props, key2) !== void 0);
+			loaded.value = exists;
+			if (exists && !props.always) return;
+			if (!observer.value || !exists) (0, vue_exports.nextTick)(registerObserver);
+		}, { immediate: true });
+		(0, vue_exports.onUnmounted)(() => {
+			observer.value?.disconnect();
+		});
+		return () => {
+			const els = [];
+			if (props.always || !loaded.value) els.push((0, vue_exports.h)(props.as, { ref: elementRef }));
+			if (!loaded.value) els.push(slots.fallback ? slots.fallback({}) : null);
+			else if (slots.default) els.push(slots.default({ fetching: fetching.value }));
+			return els;
+		};
+	}
+});
+var config$1 = config.extend({});
+// node_modules/@vue/server-renderer/dist/server-renderer.cjs.prod.js
 /**
-* @vue/server-renderer v3.5.28
+* @vue/server-renderer v3.5.46
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
 **/
-var hasRequiredServerRenderer_cjs_prod;
-function requireServerRenderer_cjs_prod() {
-  if (hasRequiredServerRenderer_cjs_prod) return serverRenderer_cjs_prod;
-  hasRequiredServerRenderer_cjs_prod = 1;
-  Object.defineProperty(serverRenderer_cjs_prod, "__esModule", { value: true });
-  var Vue = requireVue_cjs_prod();
-  var shared = require$$2;
-  var compilerSsr = require$$2$1;
-  function _interopNamespaceDefault(e2) {
-    var n2 = /* @__PURE__ */ Object.create(null);
-    if (e2) {
-      for (var k in e2) {
-        n2[k] = e2[k];
-      }
-    }
-    n2.default = e2;
-    return Object.freeze(n2);
-  }
-  var Vue__namespace = /* @__PURE__ */ _interopNamespaceDefault(Vue);
-  const shouldIgnoreProp = /* @__PURE__ */ shared.makeMap(
-    `,key,ref,innerHTML,textContent,ref_key,ref_for`
-  );
-  function ssrRenderAttrs(props, tag) {
-    let ret = "";
-    for (let key2 in props) {
-      if (shouldIgnoreProp(key2) || shared.isOn(key2) || tag === "textarea" && key2 === "value" || // force as property (not rendered in SSR)
-      key2.startsWith(".")) {
-        continue;
-      }
-      const value = props[key2];
-      if (key2.startsWith("^")) key2 = key2.slice(1);
-      if (key2 === "class" || key2 === "className") {
-        ret += ` class="${ssrRenderClass(value)}"`;
-      } else if (key2 === "style") {
-        ret += ` style="${ssrRenderStyle(value)}"`;
-      } else {
-        ret += ssrRenderDynamicAttr(key2, value, tag);
-      }
-    }
-    return ret;
-  }
-  function ssrRenderDynamicAttr(key2, value, tag) {
-    if (!shared.isRenderableAttrValue(value)) {
-      return ``;
-    }
-    const attrKey = tag && (tag.indexOf("-") > 0 || shared.isSVGTag(tag)) ? key2 : shared.propsToAttrMap[key2] || key2.toLowerCase();
-    if (shared.isBooleanAttr(attrKey)) {
-      return shared.includeBooleanAttr(value) ? ` ${attrKey}` : ``;
-    } else if (shared.isSSRSafeAttrName(attrKey)) {
-      return value === "" ? ` ${attrKey}` : ` ${attrKey}="${shared.escapeHtml(value)}"`;
-    } else {
-      console.warn(
-        `[@vue/server-renderer] Skipped rendering unsafe attribute name: ${attrKey}`
-      );
-      return ``;
-    }
-  }
-  function ssrRenderAttr(key2, value) {
-    if (!shared.isRenderableAttrValue(value)) {
-      return ``;
-    }
-    return ` ${key2}="${shared.escapeHtml(value)}"`;
-  }
-  function ssrRenderClass(raw) {
-    return shared.escapeHtml(shared.normalizeClass(raw));
-  }
-  function ssrRenderStyle(raw) {
-    if (!raw) {
-      return "";
-    }
-    if (shared.isString(raw)) {
-      return shared.escapeHtml(raw);
-    }
-    const styles = shared.normalizeStyle(ssrResetCssVars(raw));
-    return shared.escapeHtml(shared.stringifyStyle(styles));
-  }
-  function ssrResetCssVars(raw) {
-    if (!shared.isArray(raw) && shared.isObject(raw)) {
-      const res = {};
-      for (const key2 in raw) {
-        if (key2.startsWith(":--")) {
-          res[key2.slice(1)] = shared.normalizeCssVarValue(raw[key2]);
-        } else {
-          res[key2] = raw[key2];
-        }
-      }
-      return res;
-    }
-    return raw;
-  }
-  function ssrRenderComponent(comp, props = null, children = null, parentComponent = null, slotScopeId) {
-    return renderComponentVNode(
-      Vue.createVNode(comp, props, children),
-      parentComponent,
-      slotScopeId
-    );
-  }
-  const { ensureValidVNode } = Vue.ssrUtils;
-  function ssrRenderSlot(slots, slotName, slotProps, fallbackRenderFn, push, parentComponent, slotScopeId) {
-    push(`<!--[-->`);
-    ssrRenderSlotInner(
-      slots,
-      slotName,
-      slotProps,
-      fallbackRenderFn,
-      push,
-      parentComponent,
-      slotScopeId
-    );
-    push(`<!--]-->`);
-  }
-  function ssrRenderSlotInner(slots, slotName, slotProps, fallbackRenderFn, push, parentComponent, slotScopeId, transition) {
-    const slotFn = slots[slotName];
-    if (slotFn) {
-      const slotBuffer = [];
-      const bufferedPush = (item) => {
-        slotBuffer.push(item);
-      };
-      const ret = slotFn(
-        slotProps,
-        bufferedPush,
-        parentComponent,
-        slotScopeId ? " " + slotScopeId : ""
-      );
-      if (shared.isArray(ret)) {
-        const validSlotContent = ensureValidVNode(ret);
-        if (validSlotContent) {
-          renderVNodeChildren(
-            push,
-            validSlotContent,
-            parentComponent,
-            slotScopeId
-          );
-        } else if (fallbackRenderFn) {
-          fallbackRenderFn();
-        } else if (transition) {
-          push(`<!---->`);
-        }
-      } else {
-        let isEmptySlot = true;
-        if (transition) {
-          isEmptySlot = false;
-        } else {
-          for (let i2 = 0; i2 < slotBuffer.length; i2++) {
-            if (!isComment(slotBuffer[i2])) {
-              isEmptySlot = false;
-              break;
-            }
-          }
-        }
-        if (isEmptySlot) {
-          if (fallbackRenderFn) {
-            fallbackRenderFn();
-          }
-        } else {
-          let start = 0;
-          let end = slotBuffer.length;
-          if (transition && slotBuffer[0] === "<!--[-->" && slotBuffer[end - 1] === "<!--]-->") {
-            start++;
-            end--;
-          }
-          if (start < end) {
-            for (let i2 = start; i2 < end; i2++) {
-              push(slotBuffer[i2]);
-            }
-          } else if (transition) {
-            push(`<!---->`);
-          }
-        }
-      }
-    } else if (fallbackRenderFn) {
-      fallbackRenderFn();
-    } else if (transition) {
-      push(`<!---->`);
-    }
-  }
-  const commentTestRE = /^<!--[\s\S]*-->$/;
-  const commentRE = /<!--[^]*?-->/gm;
-  function isComment(item) {
-    if (typeof item !== "string" || !commentTestRE.test(item)) return false;
-    if (item.length <= 8) return true;
-    return !item.replace(commentRE, "").trim();
-  }
-  function ssrRenderTeleport(parentPush, contentRenderFn, target, disabled, parentComponent) {
-    parentPush("<!--teleport start-->");
-    const context = parentComponent.appContext.provides[Vue.ssrContextKey];
-    const teleportBuffers = context.__teleportBuffers || (context.__teleportBuffers = {});
-    const targetBuffer = teleportBuffers[target] || (teleportBuffers[target] = []);
-    const bufferIndex = targetBuffer.length;
-    let teleportContent;
-    if (disabled) {
-      contentRenderFn(parentPush);
-      teleportContent = `<!--teleport start anchor--><!--teleport anchor-->`;
-    } else {
-      const { getBuffer, push } = createBuffer();
-      push(`<!--teleport start anchor-->`);
-      contentRenderFn(push);
-      push(`<!--teleport anchor-->`);
-      teleportContent = getBuffer();
-    }
-    targetBuffer.splice(bufferIndex, 0, teleportContent);
-    parentPush("<!--teleport end-->");
-  }
-  function ssrInterpolate(value) {
-    return shared.escapeHtml(shared.toDisplayString(value));
-  }
-  function ssrRenderList(source, renderItem) {
-    if (shared.isArray(source) || shared.isString(source)) {
-      for (let i2 = 0, l2 = source.length; i2 < l2; i2++) {
-        renderItem(source[i2], i2);
-      }
-    } else if (typeof source === "number") {
-      for (let i2 = 0; i2 < source; i2++) {
-        renderItem(i2 + 1, i2);
-      }
-    } else if (shared.isObject(source)) {
-      if (source[Symbol.iterator]) {
-        const arr = Array.from(source);
-        for (let i2 = 0, l2 = arr.length; i2 < l2; i2++) {
-          renderItem(arr[i2], i2);
-        }
-      } else {
-        const keys = Object.keys(source);
-        for (let i2 = 0, l2 = keys.length; i2 < l2; i2++) {
-          const key2 = keys[i2];
-          renderItem(source[key2], key2, i2);
-        }
-      }
-    }
-  }
-  async function ssrRenderSuspense(push, { default: renderContent }) {
-    if (renderContent) {
-      renderContent();
-    } else {
-      push(`<!---->`);
-    }
-  }
-  function ssrGetDirectiveProps(instance, dir, value, arg, modifiers = {}) {
-    if (typeof dir !== "function" && dir.getSSRProps) {
-      return dir.getSSRProps(
-        {
-          dir,
-          instance: Vue.ssrUtils.getComponentPublicInstance(instance.$),
-          value,
-          oldValue: void 0,
-          arg,
-          modifiers
-        },
-        null
-      ) || {};
-    }
-    return {};
-  }
-  const ssrLooseEqual = shared.looseEqual;
-  function ssrLooseContain(arr, value) {
-    return shared.looseIndexOf(arr, value) > -1;
-  }
-  function ssrRenderDynamicModel(type, model, value) {
-    switch (type) {
-      case "radio":
-        return shared.looseEqual(model, value) ? " checked" : "";
-      case "checkbox":
-        return (shared.isArray(model) ? ssrLooseContain(model, value) : model) ? " checked" : "";
-      default:
-        return ssrRenderAttr("value", model);
-    }
-  }
-  function ssrGetDynamicModelProps(existingProps = {}, model) {
-    const { type, value } = existingProps;
-    switch (type) {
-      case "radio":
-        return shared.looseEqual(model, value) ? { checked: true } : null;
-      case "checkbox":
-        return (shared.isArray(model) ? ssrLooseContain(model, value) : model) ? { checked: true } : null;
-      default:
-        return { value: model };
-    }
-  }
-  var helpers = /* @__PURE__ */ Object.freeze({
-    __proto__: null,
-    ssrGetDirectiveProps,
-    ssrGetDynamicModelProps,
-    ssrIncludeBooleanAttr: shared.includeBooleanAttr,
-    ssrInterpolate,
-    ssrLooseContain,
-    ssrLooseEqual,
-    ssrRenderAttr,
-    ssrRenderAttrs,
-    ssrRenderClass,
-    ssrRenderComponent,
-    ssrRenderDynamicAttr,
-    ssrRenderDynamicModel,
-    ssrRenderList,
-    ssrRenderSlot,
-    ssrRenderSlotInner,
-    ssrRenderStyle,
-    ssrRenderSuspense,
-    ssrRenderTeleport,
-    ssrRenderVNode: renderVNode
-  });
-  const compileCache = /* @__PURE__ */ Object.create(null);
-  function ssrCompile(template, instance) {
-    const Component = instance.type;
-    const { isCustomElement, compilerOptions } = instance.appContext.config;
-    const { delimiters, compilerOptions: componentCompilerOptions } = Component;
-    const finalCompilerOptions = shared.extend(
-      shared.extend(
-        {
-          isCustomElement,
-          delimiters
-        },
-        compilerOptions
-      ),
-      componentCompilerOptions
-    );
-    finalCompilerOptions.isCustomElement = finalCompilerOptions.isCustomElement || shared.NO;
-    finalCompilerOptions.isNativeTag = finalCompilerOptions.isNativeTag || shared.NO;
-    const cacheKey = JSON.stringify(
-      {
-        template,
-        compilerOptions: finalCompilerOptions
-      },
-      (key2, value) => {
-        return shared.isFunction(value) ? value.toString() : value;
-      }
-    );
-    const cached = compileCache[cacheKey];
-    if (cached) {
-      return cached;
-    }
-    finalCompilerOptions.onError = (err) => {
-      {
-        throw err;
-      }
-    };
-    const { code } = compilerSsr.compile(template, finalCompilerOptions);
-    const requireMap = {
-      vue: Vue__namespace,
-      "vue/server-renderer": helpers
-    };
-    const fakeRequire = (id) => requireMap[id];
-    return compileCache[cacheKey] = Function("require", code)(fakeRequire);
-  }
-  const {
-    createComponentInstance,
-    setCurrentRenderingInstance,
-    setupComponent,
-    renderComponentRoot,
-    normalizeVNode,
-    pushWarningContext,
-    popWarningContext
-  } = Vue.ssrUtils;
-  function createBuffer() {
-    let appendable = false;
-    const buffer = [];
-    return {
-      getBuffer() {
-        return buffer;
-      },
-      push(item) {
-        const isStringItem = shared.isString(item);
-        if (appendable && isStringItem) {
-          buffer[buffer.length - 1] += item;
-          return;
-        }
-        buffer.push(item);
-        appendable = isStringItem;
-        if (shared.isPromise(item) || shared.isArray(item) && item.hasAsync) {
-          buffer.hasAsync = true;
-        }
-      }
-    };
-  }
-  function renderComponentVNode(vnode, parentComponent = null, slotScopeId) {
-    const instance = vnode.component = createComponentInstance(
-      vnode,
-      parentComponent,
-      null
-    );
-    const res = setupComponent(
-      instance,
-      true
-      /* isSSR */
-    );
-    const hasAsyncSetup = shared.isPromise(res);
-    let prefetches = instance.sp;
-    if (hasAsyncSetup || prefetches) {
-      const p2 = Promise.resolve(res).then(() => {
-        if (hasAsyncSetup) prefetches = instance.sp;
-        if (prefetches) {
-          return Promise.all(
-            prefetches.map((prefetch) => prefetch.call(instance.proxy))
-          );
-        }
-      }).catch(shared.NOOP);
-      return p2.then(() => renderComponentSubTree(instance, slotScopeId));
-    } else {
-      return renderComponentSubTree(instance, slotScopeId);
-    }
-  }
-  function renderComponentSubTree(instance, slotScopeId) {
-    const comp = instance.type;
-    const { getBuffer, push } = createBuffer();
-    if (shared.isFunction(comp)) {
-      let root = renderComponentRoot(instance);
-      if (!comp.props) {
-        for (const key2 in instance.attrs) {
-          if (key2.startsWith(`data-v-`)) {
-            (root.props || (root.props = {}))[key2] = ``;
-          }
-        }
-      }
-      renderVNode(push, instance.subTree = root, instance, slotScopeId);
-    } else {
-      if ((!instance.render || instance.render === shared.NOOP) && !instance.ssrRender && !comp.ssrRender && shared.isString(comp.template)) {
-        comp.ssrRender = ssrCompile(comp.template, instance);
-      }
-      const ssrRender = instance.ssrRender || comp.ssrRender;
-      if (ssrRender) {
-        let attrs = instance.inheritAttrs !== false ? instance.attrs : void 0;
-        let hasCloned = false;
-        let cur = instance;
-        while (true) {
-          const scopeId = cur.vnode.scopeId;
-          if (scopeId) {
-            if (!hasCloned) {
-              attrs = { ...attrs };
-              hasCloned = true;
-            }
-            attrs[scopeId] = "";
-          }
-          const parent = cur.parent;
-          if (parent && parent.subTree && parent.subTree === cur.vnode) {
-            cur = parent;
-          } else {
-            break;
-          }
-        }
-        if (slotScopeId) {
-          if (!hasCloned) attrs = { ...attrs };
-          const slotScopeIdList = slotScopeId.trim().split(" ");
-          for (let i2 = 0; i2 < slotScopeIdList.length; i2++) {
-            attrs[slotScopeIdList[i2]] = "";
-          }
-        }
-        const prev = setCurrentRenderingInstance(instance);
-        try {
-          ssrRender(
-            instance.proxy,
-            push,
-            instance,
-            attrs,
-            // compiler-optimized bindings
-            instance.props,
-            instance.setupState,
-            instance.data,
-            instance.ctx
-          );
-        } finally {
-          setCurrentRenderingInstance(prev);
-        }
-      } else if (instance.render && instance.render !== shared.NOOP) {
-        renderVNode(
-          push,
-          instance.subTree = renderComponentRoot(instance),
-          instance,
-          slotScopeId
-        );
-      } else {
-        const componentName = comp.name || comp.__file || `<Anonymous>`;
-        Vue.warn(`Component ${componentName} is missing template or render function.`);
-        push(`<!---->`);
-      }
-    }
-    return getBuffer();
-  }
-  function renderVNode(push, vnode, parentComponent, slotScopeId) {
-    const { type, shapeFlag, children, dirs, props } = vnode;
-    if (dirs) {
-      vnode.props = applySSRDirectives(vnode, props, dirs);
-    }
-    switch (type) {
-      case Vue.Text:
-        push(shared.escapeHtml(children));
-        break;
-      case Vue.Comment:
-        push(
-          children ? `<!--${shared.escapeHtmlComment(children)}-->` : `<!---->`
-        );
-        break;
-      case Vue.Static:
-        push(children);
-        break;
-      case Vue.Fragment:
-        if (vnode.slotScopeIds) {
-          slotScopeId = (slotScopeId ? slotScopeId + " " : "") + vnode.slotScopeIds.join(" ");
-        }
-        push(`<!--[-->`);
-        renderVNodeChildren(
-          push,
-          children,
-          parentComponent,
-          slotScopeId
-        );
-        push(`<!--]-->`);
-        break;
-      default:
-        if (shapeFlag & 1) {
-          renderElementVNode(push, vnode, parentComponent, slotScopeId);
-        } else if (shapeFlag & 6) {
-          push(renderComponentVNode(vnode, parentComponent, slotScopeId));
-        } else if (shapeFlag & 64) {
-          renderTeleportVNode(push, vnode, parentComponent, slotScopeId);
-        } else if (shapeFlag & 128) {
-          renderVNode(push, vnode.ssContent, parentComponent, slotScopeId);
-        } else {
-          Vue.warn(
-            "[@vue/server-renderer] Invalid VNode type:",
-            type,
-            `(${typeof type})`
-          );
-        }
-    }
-  }
-  function renderVNodeChildren(push, children, parentComponent, slotScopeId) {
-    for (let i2 = 0; i2 < children.length; i2++) {
-      renderVNode(push, normalizeVNode(children[i2]), parentComponent, slotScopeId);
-    }
-  }
-  function renderElementVNode(push, vnode, parentComponent, slotScopeId) {
-    const tag = vnode.type;
-    let { props, children, shapeFlag, scopeId } = vnode;
-    let openTag = `<${tag}`;
-    if (props) {
-      openTag += ssrRenderAttrs(props, tag);
-    }
-    if (scopeId) {
-      openTag += ` ${scopeId}`;
-    }
-    let curParent = parentComponent;
-    let curVnode = vnode;
-    while (curParent && curVnode === curParent.subTree) {
-      curVnode = curParent.vnode;
-      if (curVnode.scopeId) {
-        openTag += ` ${curVnode.scopeId}`;
-      }
-      curParent = curParent.parent;
-    }
-    if (slotScopeId) {
-      openTag += ` ${slotScopeId}`;
-    }
-    push(openTag + `>`);
-    if (!shared.isVoidTag(tag)) {
-      let hasChildrenOverride = false;
-      if (props) {
-        if (props.innerHTML) {
-          hasChildrenOverride = true;
-          push(props.innerHTML);
-        } else if (props.textContent) {
-          hasChildrenOverride = true;
-          push(shared.escapeHtml(props.textContent));
-        } else if (tag === "textarea" && props.value) {
-          hasChildrenOverride = true;
-          push(shared.escapeHtml(props.value));
-        }
-      }
-      if (!hasChildrenOverride) {
-        if (shapeFlag & 8) {
-          push(shared.escapeHtml(children));
-        } else if (shapeFlag & 16) {
-          renderVNodeChildren(
-            push,
-            children,
-            parentComponent,
-            slotScopeId
-          );
-        }
-      }
-      push(`</${tag}>`);
-    }
-  }
-  function applySSRDirectives(vnode, rawProps, dirs) {
-    const toMerge = [];
-    for (let i2 = 0; i2 < dirs.length; i2++) {
-      const binding = dirs[i2];
-      const {
-        dir: { getSSRProps }
-      } = binding;
-      if (getSSRProps) {
-        const props = getSSRProps(binding, vnode);
-        if (props) toMerge.push(props);
-      }
-    }
-    return Vue.mergeProps(rawProps || {}, ...toMerge);
-  }
-  function renderTeleportVNode(push, vnode, parentComponent, slotScopeId) {
-    const target = vnode.props && vnode.props.to;
-    const disabled = vnode.props && vnode.props.disabled;
-    if (!target) {
-      if (!disabled) {
-        Vue.warn(`[@vue/server-renderer] Teleport is missing target prop.`);
-      }
-      return [];
-    }
-    if (!shared.isString(target)) {
-      Vue.warn(
-        `[@vue/server-renderer] Teleport target must be a query selector string.`
-      );
-      return [];
-    }
-    ssrRenderTeleport(
-      push,
-      (push2) => {
-        renderVNodeChildren(
-          push2,
-          vnode.children,
-          parentComponent,
-          slotScopeId
-        );
-      },
-      target,
-      disabled || disabled === "",
-      parentComponent
-    );
-  }
-  const { isVNode: isVNode$1 } = Vue.ssrUtils;
-  function nestedUnrollBuffer(buffer, parentRet, startIndex) {
-    if (!buffer.hasAsync) {
-      return parentRet + unrollBufferSync$1(buffer);
-    }
-    let ret = parentRet;
-    for (let i2 = startIndex; i2 < buffer.length; i2 += 1) {
-      const item = buffer[i2];
-      if (shared.isString(item)) {
-        ret += item;
-        continue;
-      }
-      if (shared.isPromise(item)) {
-        return item.then((nestedItem) => {
-          buffer[i2] = nestedItem;
-          return nestedUnrollBuffer(buffer, ret, i2);
-        });
-      }
-      const result = nestedUnrollBuffer(item, ret, 0);
-      if (shared.isPromise(result)) {
-        return result.then((nestedItem) => {
-          buffer[i2] = nestedItem;
-          return nestedUnrollBuffer(buffer, "", i2);
-        });
-      }
-      ret = result;
-    }
-    return ret;
-  }
-  function unrollBuffer$1(buffer) {
-    return nestedUnrollBuffer(buffer, "", 0);
-  }
-  function unrollBufferSync$1(buffer) {
-    let ret = "";
-    for (let i2 = 0; i2 < buffer.length; i2++) {
-      let item = buffer[i2];
-      if (shared.isString(item)) {
-        ret += item;
-      } else {
-        ret += unrollBufferSync$1(item);
-      }
-    }
-    return ret;
-  }
-  async function renderToString(input, context = {}) {
-    if (isVNode$1(input)) {
-      return renderToString(Vue.createApp({ render: () => input }), context);
-    }
-    const vnode = Vue.createVNode(input._component, input._props);
-    vnode.appContext = input._context;
-    input.provide(Vue.ssrContextKey, context);
-    const buffer = await renderComponentVNode(vnode);
-    const result = await unrollBuffer$1(buffer);
-    await resolveTeleports(context);
-    if (context.__watcherHandles) {
-      for (const unwatch of context.__watcherHandles) {
-        unwatch();
-      }
-    }
-    return result;
-  }
-  async function resolveTeleports(context) {
-    if (context.__teleportBuffers) {
-      context.teleports = context.teleports || {};
-      for (const key2 in context.__teleportBuffers) {
-        context.teleports[key2] = await unrollBuffer$1(
-          await Promise.all([context.__teleportBuffers[key2]])
-        );
-      }
-    }
-  }
-  const { isVNode } = Vue.ssrUtils;
-  async function unrollBuffer(buffer, stream) {
-    if (buffer.hasAsync) {
-      for (let i2 = 0; i2 < buffer.length; i2++) {
-        let item = buffer[i2];
-        if (shared.isPromise(item)) {
-          item = await item;
-        }
-        if (shared.isString(item)) {
-          stream.push(item);
-        } else {
-          await unrollBuffer(item, stream);
-        }
-      }
-    } else {
-      unrollBufferSync(buffer, stream);
-    }
-  }
-  function unrollBufferSync(buffer, stream) {
-    for (let i2 = 0; i2 < buffer.length; i2++) {
-      let item = buffer[i2];
-      if (shared.isString(item)) {
-        stream.push(item);
-      } else {
-        unrollBufferSync(item, stream);
-      }
-    }
-  }
-  function renderToSimpleStream(input, context, stream) {
-    if (isVNode(input)) {
-      return renderToSimpleStream(
-        Vue.createApp({ render: () => input }),
-        context,
-        stream
-      );
-    }
-    const vnode = Vue.createVNode(input._component, input._props);
-    vnode.appContext = input._context;
-    input.provide(Vue.ssrContextKey, context);
-    Promise.resolve(renderComponentVNode(vnode)).then((buffer) => unrollBuffer(buffer, stream)).then(() => resolveTeleports(context)).then(() => {
-      if (context.__watcherHandles) {
-        for (const unwatch of context.__watcherHandles) {
-          unwatch();
-        }
-      }
-    }).then(() => stream.push(null)).catch((error) => {
-      stream.destroy(error);
-    });
-    return stream;
-  }
-  function renderToStream(input, context = {}) {
-    console.warn(
-      `[@vue/server-renderer] renderToStream is deprecated - use renderToNodeStream instead.`
-    );
-    return renderToNodeStream(input, context);
-  }
-  function renderToNodeStream(input, context = {}) {
-    const stream = new require$$3.Readable({ read() {
-    } });
-    if (!stream) {
-      throw new Error(
-        `ESM build of renderToStream() does not support renderToNodeStream(). Use pipeToNodeWritable() with an existing Node.js Writable stream instance instead.`
-      );
-    }
-    return renderToSimpleStream(input, context, stream);
-  }
-  function pipeToNodeWritable(input, context = {}, writable) {
-    renderToSimpleStream(input, context, {
-      push(content) {
-        if (content != null) {
-          writable.write(content);
-        } else {
-          writable.end();
-        }
-      },
-      destroy(err) {
-        writable.destroy(err);
-      }
-    });
-  }
-  function renderToWebStream(input, context = {}) {
-    if (typeof ReadableStream !== "function") {
-      throw new Error(
-        `ReadableStream constructor is not available in the global scope. If the target environment does support web streams, consider using pipeToWebWritable() with an existing WritableStream instance instead.`
-      );
-    }
-    const encoder = new TextEncoder();
-    let cancelled = false;
-    return new ReadableStream({
-      start(controller) {
-        renderToSimpleStream(input, context, {
-          push(content) {
-            if (cancelled) return;
-            if (content != null) {
-              controller.enqueue(encoder.encode(content));
-            } else {
-              controller.close();
-            }
-          },
-          destroy(err) {
-            controller.error(err);
-          }
-        });
-      },
-      cancel() {
-        cancelled = true;
-      }
-    });
-  }
-  function pipeToWebWritable(input, context = {}, writable) {
-    const writer = writable.getWriter();
-    const encoder = new TextEncoder();
-    let hasReady = false;
-    try {
-      hasReady = shared.isPromise(writer.ready);
-    } catch (e2) {
-    }
-    renderToSimpleStream(input, context, {
-      async push(content) {
-        if (hasReady) {
-          await writer.ready;
-        }
-        if (content != null) {
-          return writer.write(encoder.encode(content));
-        } else {
-          return writer.close();
-        }
-      },
-      destroy(err) {
-        console.log(err);
-        writer.close();
-      }
-    });
-  }
-  Vue.initDirectivesForSSR();
-  serverRenderer_cjs_prod.ssrIncludeBooleanAttr = shared.includeBooleanAttr;
-  serverRenderer_cjs_prod.pipeToNodeWritable = pipeToNodeWritable;
-  serverRenderer_cjs_prod.pipeToWebWritable = pipeToWebWritable;
-  serverRenderer_cjs_prod.renderToNodeStream = renderToNodeStream;
-  serverRenderer_cjs_prod.renderToSimpleStream = renderToSimpleStream;
-  serverRenderer_cjs_prod.renderToStream = renderToStream;
-  serverRenderer_cjs_prod.renderToString = renderToString;
-  serverRenderer_cjs_prod.renderToWebStream = renderToWebStream;
-  serverRenderer_cjs_prod.ssrGetDirectiveProps = ssrGetDirectiveProps;
-  serverRenderer_cjs_prod.ssrGetDynamicModelProps = ssrGetDynamicModelProps;
-  serverRenderer_cjs_prod.ssrInterpolate = ssrInterpolate;
-  serverRenderer_cjs_prod.ssrLooseContain = ssrLooseContain;
-  serverRenderer_cjs_prod.ssrLooseEqual = ssrLooseEqual;
-  serverRenderer_cjs_prod.ssrRenderAttr = ssrRenderAttr;
-  serverRenderer_cjs_prod.ssrRenderAttrs = ssrRenderAttrs;
-  serverRenderer_cjs_prod.ssrRenderClass = ssrRenderClass;
-  serverRenderer_cjs_prod.ssrRenderComponent = ssrRenderComponent;
-  serverRenderer_cjs_prod.ssrRenderDynamicAttr = ssrRenderDynamicAttr;
-  serverRenderer_cjs_prod.ssrRenderDynamicModel = ssrRenderDynamicModel;
-  serverRenderer_cjs_prod.ssrRenderList = ssrRenderList;
-  serverRenderer_cjs_prod.ssrRenderSlot = ssrRenderSlot;
-  serverRenderer_cjs_prod.ssrRenderSlotInner = ssrRenderSlotInner;
-  serverRenderer_cjs_prod.ssrRenderStyle = ssrRenderStyle;
-  serverRenderer_cjs_prod.ssrRenderSuspense = ssrRenderSuspense;
-  serverRenderer_cjs_prod.ssrRenderTeleport = ssrRenderTeleport;
-  serverRenderer_cjs_prod.ssrRenderVNode = renderVNode;
-  return serverRenderer_cjs_prod;
-}
-var serverRenderer_cjs_prodExports = requireServerRenderer_cjs_prod();
+var require_server_renderer_cjs_prod = /* @__PURE__ */ __commonJSMin(((exports) => {
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var Vue = __require("@vue/runtime-dom");
+	var shared = __require("@vue/shared");
+	var compilerSsr = __require("@vue/compiler-ssr");
+	function _interopNamespaceDefault(e) {
+		var n = Object.create(null);
+		if (e) for (var k in e) n[k] = e[k];
+		n.default = e;
+		return Object.freeze(n);
+	}
+	var Vue__namespace = /*#__PURE__*/ _interopNamespaceDefault(Vue);
+	var shouldIgnoreProp = /* @__PURE__ */ shared.makeMap(`,key,ref,innerHTML,textContent,ref_key,ref_for`);
+	function ssrRenderAttrs(props, tag) {
+		let ret = "";
+		for (let key in props) {
+			if (shouldIgnoreProp(key) || shared.isOn(key) || tag === "textarea" && key === "value" || key.startsWith(".")) continue;
+			const value = props[key];
+			if (key.startsWith("^")) key = key.slice(1);
+			if (key === "class") ret += ` class="${ssrRenderClass(value)}"`;
+			else if (key === "style") ret += ` style="${ssrRenderStyle(value)}"`;
+			else if (key === "className") {
+				if (value != null) ret += ` class="${shared.escapeHtml(String(value))}"`;
+			} else ret += ssrRenderDynamicAttr(key, value, tag);
+		}
+		return ret;
+	}
+	function ssrRenderDynamicAttr(key, value, tag) {
+		if (!shared.isRenderableAttrValue(value)) return ``;
+		const attrKey = tag && (tag.indexOf("-") > 0 || shared.isSVGTag(tag)) ? key : shared.propsToAttrMap[key] || key.toLowerCase();
+		if (shared.isBooleanAttr(attrKey) || attrKey === "hidden" && (typeof value === "boolean" || typeof value === "number")) return shared.includeBooleanAttr(value) ? ` ${attrKey}` : ``;
+		else if (shared.isSSRSafeAttrName(attrKey)) return value === "" ? ` ${attrKey}` : ` ${attrKey}="${shared.escapeHtml(value)}"`;
+		else {
+			console.warn(`[@vue/server-renderer] Skipped rendering unsafe attribute name: ${attrKey}`);
+			return ``;
+		}
+	}
+	function ssrRenderAttr(key, value) {
+		if (!shared.isRenderableAttrValue(value)) return ``;
+		return ` ${key}="${shared.escapeHtml(value)}"`;
+	}
+	function ssrRenderClass(raw) {
+		return shared.escapeHtml(shared.normalizeClass(raw));
+	}
+	function ssrRenderStyle(raw) {
+		if (!raw) return "";
+		if (shared.isString(raw)) return shared.escapeHtml(raw);
+		const styles = shared.normalizeStyle(ssrResetCssVars(raw));
+		return shared.escapeHtml(shared.stringifyStyle(styles));
+	}
+	function ssrResetCssVars(raw) {
+		if (!shared.isArray(raw) && shared.isObject(raw)) {
+			const res = {};
+			for (const key in raw) if (key.startsWith(":--")) res[key.slice(1)] = shared.normalizeCssVarValue(raw[key]);
+			else res[key] = raw[key];
+			return res;
+		}
+		return raw;
+	}
+	function ssrRenderComponent(comp, props = null, children = null, parentComponent = null, slotScopeId) {
+		return renderComponentVNode(Vue.createVNode(comp, props, children), parentComponent, slotScopeId);
+	}
+	var { ensureValidVNode } = Vue.ssrUtils;
+	function ssrRenderSlot(slots, slotName, slotProps, fallbackRenderFn, push, parentComponent, slotScopeId) {
+		push(`<!--[-->`);
+		ssrRenderSlotInner(slots, slotName, slotProps, fallbackRenderFn, push, parentComponent, slotScopeId);
+		push(`<!--]-->`);
+	}
+	function ssrRenderSlotInner(slots, slotName, slotProps, fallbackRenderFn, push, parentComponent, slotScopeId, transition) {
+		const slotFn = slots[slotName];
+		if (slotFn) {
+			const slotBuffer = [];
+			const bufferedPush = (item) => {
+				slotBuffer.push(item);
+			};
+			const ret = slotFn(slotProps || {}, bufferedPush, parentComponent, slotScopeId ? " " + slotScopeId : "");
+			if (shared.isArray(ret)) {
+				const validSlotContent = ensureValidVNode(ret);
+				if (validSlotContent) renderVNodeChildren(push, validSlotContent, parentComponent, slotScopeId);
+				else if (fallbackRenderFn) fallbackRenderFn();
+				else if (transition) push(`<!---->`);
+			} else {
+				let isEmptySlot = true;
+				if (transition) isEmptySlot = false;
+				else for (let i = 0; i < slotBuffer.length; i++) if (!isComment(slotBuffer[i])) {
+					isEmptySlot = false;
+					break;
+				}
+				if (isEmptySlot) {
+					if (fallbackRenderFn) fallbackRenderFn();
+				} else {
+					let start = 0;
+					let end = slotBuffer.length;
+					if (transition && slotBuffer[0] === "<!--[-->" && slotBuffer[end - 1] === "<!--]-->") {
+						start++;
+						end--;
+					}
+					if (start < end) for (let i = start; i < end; i++) push(slotBuffer[i]);
+					else if (transition) push(`<!---->`);
+				}
+			}
+		} else if (fallbackRenderFn) fallbackRenderFn();
+		else if (transition) push(`<!---->`);
+	}
+	var commentTestRE = /^<!--[\s\S]*-->$/;
+	var commentRE = /<!--[^]*?-->/gm;
+	function isComment(item) {
+		if (typeof item !== "string" || !commentTestRE.test(item)) return false;
+		if (item.length <= 8) return true;
+		return !item.replace(commentRE, "").trim();
+	}
+	function ssrRenderTeleport(parentPush, contentRenderFn, target, disabled, parentComponent) {
+		parentPush("<!--teleport start-->");
+		const context = parentComponent.appContext.provides[Vue.ssrContextKey];
+		const teleportBuffers = context.__teleportBuffers || (context.__teleportBuffers = {});
+		const targetBuffer = teleportBuffers[target] || (teleportBuffers[target] = []);
+		const bufferIndex = targetBuffer.length;
+		let teleportContent;
+		if (disabled) {
+			contentRenderFn(parentPush);
+			teleportContent = `<!--teleport start anchor--><!--teleport anchor-->`;
+		} else {
+			const { getBuffer, push } = createBuffer();
+			push(`<!--teleport start anchor-->`);
+			contentRenderFn(push);
+			push(`<!--teleport anchor-->`);
+			teleportContent = getBuffer();
+		}
+		targetBuffer.splice(bufferIndex, 0, teleportContent);
+		if (shared.isPromise(teleportContent) || shared.isArray(teleportContent) && teleportContent.hasAsync) targetBuffer.hasAsync = true;
+		parentPush("<!--teleport end-->");
+	}
+	function ssrInterpolate(value) {
+		return shared.escapeHtml(shared.toDisplayString(value));
+	}
+	function ssrRenderList(source, renderItem) {
+		if (shared.isArray(source) || shared.isString(source)) for (let i = 0, l = source.length; i < l; i++) renderItem(source[i], i);
+		else if (typeof source === "number") {
+			if (!Number.isInteger(source) || source < 0) return;
+			for (let i = 0; i < source; i++) renderItem(i + 1, i);
+		} else if (shared.isObject(source)) {
+			if (source[Symbol.iterator]) {
+				let i = 0;
+				for (const item of source) renderItem(item, i++);
+			} else {
+				const keys = Object.keys(source);
+				for (let i = 0, l = keys.length; i < l; i++) {
+					const key = keys[i];
+					renderItem(source[key], key, i);
+				}
+			}
+		}
+	}
+	function ssrRenderSuspense(push, { default: renderContent }) {
+		if (renderContent) renderContent();
+		else push(`<!---->`);
+	}
+	function ssrGetDirectiveProps(instance, dir, value, arg, modifiers = {}) {
+		if (typeof dir !== "function" && dir.getSSRProps) return dir.getSSRProps({
+			dir,
+			instance: Vue.ssrUtils.getComponentPublicInstance(instance.$),
+			value,
+			oldValue: void 0,
+			arg,
+			modifiers
+		}, null) || {};
+		return {};
+	}
+	var ssrLooseEqual = shared.looseEqual;
+	function ssrLooseContain(arr, value) {
+		return shared.looseIndexOf(arr, value) > -1;
+	}
+	function ssrRenderDynamicModel(type, model, value) {
+		switch (type) {
+			case "radio": return shared.looseEqual(model, value) ? " checked" : "";
+			case "checkbox": return (shared.isArray(model) ? ssrLooseContain(model, value) : model) ? " checked" : "";
+			default: return ssrRenderAttr("value", model);
+		}
+	}
+	function ssrGetDynamicModelProps(existingProps = {}, model) {
+		const { type, value } = existingProps;
+		switch (type) {
+			case "radio": return shared.looseEqual(model, value) ? { checked: true } : null;
+			case "checkbox": return (shared.isArray(model) ? ssrLooseContain(model, value) : model) ? { checked: true } : null;
+			default: return { value: model };
+		}
+	}
+	var helpers = /*#__PURE__*/ Object.freeze({
+		__proto__: null,
+		ssrGetDirectiveProps,
+		ssrGetDynamicModelProps,
+		ssrIncludeBooleanAttr: shared.includeBooleanAttr,
+		ssrInterpolate,
+		ssrLooseContain,
+		ssrLooseEqual,
+		ssrRenderAttr,
+		ssrRenderAttrs,
+		ssrRenderClass,
+		ssrRenderComponent,
+		ssrRenderDynamicAttr,
+		ssrRenderDynamicModel,
+		ssrRenderList,
+		ssrRenderSlot,
+		ssrRenderSlotInner,
+		ssrRenderStyle,
+		ssrRenderSuspense,
+		ssrRenderTeleport,
+		get ssrRenderVNode() {
+			return renderVNode;
+		}
+	});
+	var compileCache = /* @__PURE__ */ Object.create(null);
+	function ssrCompile(template, instance) {
+		const Component = instance.type;
+		const { isCustomElement, compilerOptions } = instance.appContext.config;
+		const { delimiters, compilerOptions: componentCompilerOptions } = Component;
+		const finalCompilerOptions = shared.extend(shared.extend({
+			isCustomElement,
+			delimiters
+		}, compilerOptions), componentCompilerOptions);
+		finalCompilerOptions.isCustomElement = finalCompilerOptions.isCustomElement || shared.NO;
+		finalCompilerOptions.isNativeTag = finalCompilerOptions.isNativeTag || shared.NO;
+		const cacheKey = JSON.stringify({
+			template,
+			compilerOptions: finalCompilerOptions
+		}, (key, value) => {
+			return shared.isFunction(value) ? value.toString() : value;
+		});
+		const cached = compileCache[cacheKey];
+		if (cached) return cached;
+		finalCompilerOptions.onError = (err) => {
+			throw err;
+		};
+		const { code } = compilerSsr.compile(template, finalCompilerOptions);
+		const requireMap = {
+			vue: Vue__namespace,
+			"vue/server-renderer": helpers
+		};
+		const fakeRequire = (id) => requireMap[id];
+		return compileCache[cacheKey] = Function("require", code)(fakeRequire);
+	}
+	var { createComponentInstance, setCurrentRenderingInstance, setupComponent, renderComponentRoot, normalizeVNode, pushWarningContext, popWarningContext } = Vue.ssrUtils;
+	function createBuffer() {
+		let appendable = false;
+		const buffer = [];
+		return {
+			getBuffer() {
+				return buffer;
+			},
+			push(item) {
+				const isStringItem = shared.isString(item);
+				if (appendable && isStringItem) {
+					buffer[buffer.length - 1] += item;
+					return;
+				}
+				buffer.push(item);
+				appendable = isStringItem;
+				if (shared.isPromise(item) || shared.isArray(item) && item.hasAsync) buffer.hasAsync = true;
+			}
+		};
+	}
+	function renderComponentVNode(vnode, parentComponent = null, slotScopeId) {
+		const instance = vnode.component = createComponentInstance(vnode, parentComponent, null);
+		const res = setupComponent(instance, true);
+		const hasAsyncSetup = shared.isPromise(res);
+		let prefetches = instance.sp;
+		let p;
+		if (hasAsyncSetup || prefetches) p = Promise.resolve(res).then(() => {
+			if (hasAsyncSetup) prefetches = instance.sp;
+			if (prefetches) try {
+				return Promise.all(prefetches.map((prefetch) => prefetch.call(instance.proxy))).catch(shared.NOOP);
+			} catch {}
+		}).then(() => renderComponentSubTree(instance, slotScopeId));
+		else try {
+			return renderComponentSubTree(instance, slotScopeId);
+		} catch (err) {
+			p = Promise.reject(err);
+		}
+		p.catch(shared.NOOP);
+		return p;
+	}
+	function renderComponentSubTree(instance, slotScopeId) {
+		const comp = instance.type;
+		const { getBuffer, push } = createBuffer();
+		if (shared.isFunction(comp)) {
+			let root = renderComponentRoot(instance);
+			if (!comp.props) {
+				for (const key in instance.attrs) if (key.startsWith(`data-v-`)) (root.props || (root.props = {}))[key] = ``;
+			}
+			renderVNode(push, instance.subTree = root, instance, slotScopeId);
+		} else {
+			if ((!instance.render || instance.render === shared.NOOP) && !instance.ssrRender && !comp.ssrRender && shared.isString(comp.template)) comp.ssrRender = ssrCompile(comp.template, instance);
+			const ssrRender = instance.ssrRender || comp.ssrRender;
+			if (ssrRender) {
+				let attrs = instance.inheritAttrs !== false ? instance.attrs : void 0;
+				let hasCloned = false;
+				let cur = instance;
+				while (true) {
+					const scopeId = cur.vnode.scopeId;
+					if (scopeId) {
+						if (!hasCloned) {
+							attrs = { ...attrs };
+							hasCloned = true;
+						}
+						attrs[scopeId] = "";
+					}
+					const parent = cur.parent;
+					if (parent && parent.subTree && parent.subTree === cur.vnode) cur = parent;
+					else break;
+				}
+				if (slotScopeId) {
+					if (!hasCloned) attrs = { ...attrs };
+					const slotScopeIdList = slotScopeId.trim().split(" ");
+					for (let i = 0; i < slotScopeIdList.length; i++) attrs[slotScopeIdList[i]] = "";
+				}
+				const prev = setCurrentRenderingInstance(instance);
+				try {
+					ssrRender(instance.proxy, push, instance, attrs, instance.props, instance.setupState, instance.data, instance.ctx);
+				} catch (err) {
+					Vue.handleError(err, instance, 1);
+				} finally {
+					setCurrentRenderingInstance(prev);
+				}
+			} else if (instance.render && instance.render !== shared.NOOP) renderVNode(push, instance.subTree = renderComponentRoot(instance), instance, slotScopeId);
+			else {
+				const componentName = comp.name || comp.__file || `<Anonymous>`;
+				Vue.warn(`Component ${componentName} is missing template or render function.`);
+				push(`<!---->`);
+			}
+		}
+		return getBuffer();
+	}
+	function renderVNode(push, vnode, parentComponent, slotScopeId) {
+		const { type, shapeFlag, children, dirs, props } = vnode;
+		if (dirs) vnode.props = applySSRDirectives(vnode, props, dirs);
+		switch (type) {
+			case Vue.Text:
+				push(shared.escapeHtml(children));
+				break;
+			case Vue.Comment:
+				push(children ? `<!--${shared.escapeHtmlComment(children)}-->` : `<!---->`);
+				break;
+			case Vue.Static:
+				push(children);
+				break;
+			case Vue.Fragment:
+				if (vnode.slotScopeIds) slotScopeId = (slotScopeId ? slotScopeId + " " : "") + vnode.slotScopeIds.join(" ");
+				push(`<!--[-->`);
+				renderVNodeChildren(push, children, parentComponent, slotScopeId);
+				push(`<!--]-->`);
+				break;
+			default: if (shapeFlag & 1) renderElementVNode(push, vnode, parentComponent, slotScopeId);
+			else if (shapeFlag & 6) push(renderComponentVNode(vnode, parentComponent, slotScopeId));
+			else if (shapeFlag & 64) renderTeleportVNode(push, vnode, parentComponent, slotScopeId);
+			else if (shapeFlag & 128) renderVNode(push, vnode.ssContent, parentComponent, slotScopeId);
+			else Vue.warn("[@vue/server-renderer] Invalid VNode type:", type, `(${typeof type})`);
+		}
+	}
+	function renderVNodeChildren(push, children, parentComponent, slotScopeId) {
+		for (let i = 0; i < children.length; i++) renderVNode(push, normalizeVNode(children[i]), parentComponent, slotScopeId);
+	}
+	function renderElementVNode(push, vnode, parentComponent, slotScopeId) {
+		const tag = vnode.type;
+		let { props, children, shapeFlag, scopeId } = vnode;
+		let openTag = `<${tag}`;
+		if (props) openTag += ssrRenderAttrs(props, tag);
+		const renderedScopeIds = [];
+		const appendScopeId = (id) => {
+			if (id && (!props || !shared.hasOwn(props, id)) && !renderedScopeIds.includes(id)) {
+				openTag += ` ${id}`;
+				renderedScopeIds.push(id);
+			}
+		};
+		if (scopeId) appendScopeId(scopeId);
+		let curParent = parentComponent;
+		let curVnode = vnode;
+		while (curParent && curVnode === curParent.subTree) {
+			curVnode = curParent.vnode;
+			if (curVnode.scopeId) appendScopeId(curVnode.scopeId);
+			curParent = curParent.parent;
+		}
+		if (slotScopeId) {
+			const slotScopeIdList = slotScopeId.trim().split(" ");
+			for (let i = 0; i < slotScopeIdList.length; i++) appendScopeId(slotScopeIdList[i]);
+		}
+		push(openTag + `>`);
+		if (!shared.isVoidTag(tag)) {
+			let hasChildrenOverride = false;
+			if (props) {
+				if (props.innerHTML != null) {
+					hasChildrenOverride = true;
+					push(String(props.innerHTML));
+				} else if (props.textContent != null) {
+					hasChildrenOverride = true;
+					push(shared.escapeHtml(props.textContent));
+				} else if (tag === "textarea" && props.value != null) {
+					hasChildrenOverride = true;
+					push(shared.escapeHtml(props.value));
+				}
+			}
+			if (!hasChildrenOverride) {
+				if (shapeFlag & 8) push(shared.escapeHtml(children));
+				else if (shapeFlag & 16) renderVNodeChildren(push, children, parentComponent, slotScopeId);
+			}
+			push(`</${tag}>`);
+		}
+	}
+	function applySSRDirectives(vnode, rawProps, dirs) {
+		const toMerge = [];
+		for (let i = 0; i < dirs.length; i++) {
+			const binding = dirs[i];
+			const { dir: { getSSRProps } } = binding;
+			if (getSSRProps) {
+				const props = getSSRProps(binding, vnode);
+				if (props) toMerge.push(props);
+			}
+		}
+		return Vue.mergeProps(rawProps || {}, ...toMerge);
+	}
+	function renderTeleportVNode(push, vnode, parentComponent, slotScopeId) {
+		const target = vnode.props && vnode.props.to;
+		const disabled = vnode.props && vnode.props.disabled;
+		if (!target) {
+			if (!disabled) Vue.warn(`[@vue/server-renderer] Teleport is missing target prop.`);
+			return [];
+		}
+		if (!shared.isString(target)) {
+			Vue.warn(`[@vue/server-renderer] Teleport target must be a query selector string.`);
+			return [];
+		}
+		ssrRenderTeleport(push, (push2) => {
+			renderVNodeChildren(push2, vnode.children, parentComponent, slotScopeId);
+		}, target, disabled || disabled === "", parentComponent);
+	}
+	var { isVNode: isVNode$1 } = Vue.ssrUtils;
+	function nestedUnrollBuffer(buffer, parentRet, startIndex) {
+		if (!buffer.hasAsync) return parentRet + unrollBufferSync$1(buffer);
+		let ret = parentRet;
+		for (let i = startIndex; i < buffer.length; i += 1) {
+			const item = buffer[i];
+			if (shared.isString(item)) {
+				ret += item;
+				continue;
+			}
+			if (shared.isPromise(item)) return item.then((nestedItem) => {
+				buffer[i] = nestedItem;
+				return nestedUnrollBuffer(buffer, ret, i);
+			});
+			const result = nestedUnrollBuffer(item, ret, 0);
+			if (shared.isPromise(result)) return result.then((nestedItem) => {
+				buffer[i] = nestedItem;
+				return nestedUnrollBuffer(buffer, "", i);
+			});
+			ret = result;
+		}
+		return ret;
+	}
+	function unrollBuffer$1(buffer) {
+		return nestedUnrollBuffer(buffer, "", 0);
+	}
+	function unrollBufferSync$1(buffer) {
+		let ret = "";
+		for (let i = 0; i < buffer.length; i++) {
+			let item = buffer[i];
+			if (shared.isString(item)) ret += item;
+			else ret += unrollBufferSync$1(item);
+		}
+		return ret;
+	}
+	async function renderToString(input, context = {}) {
+		if (isVNode$1(input)) return renderToString(Vue.createApp({ render: () => input }), context);
+		const vnode = Vue.createVNode(input._component, input._props);
+		vnode.appContext = input._context;
+		input.provide(Vue.ssrContextKey, context);
+		let buffer;
+		let result;
+		try {
+			buffer = await renderComponentVNode(vnode);
+			result = await unrollBuffer$1(buffer);
+			await resolveTeleports(context);
+		} catch (err) {
+			cleanupFailedRender(buffer, context);
+			throw err;
+		}
+		stopWatchers(context);
+		return result;
+	}
+	function stopWatchers(context, start = 0) {
+		const handles = context.__watcherHandles;
+		if (handles) for (let i = start; i < handles.length; i++) handles[i]();
+	}
+	function cleanupFailedRender(buffer, context) {
+		const stopped = context.__watcherHandles ? context.__watcherHandles.length : 0;
+		try {
+			stopWatchers(context);
+		} catch {}
+		(async () => {
+			if (buffer) await settleBuffer(buffer);
+			for (const key in context.__teleportBuffers) await settleBuffer(context.__teleportBuffers[key]);
+			stopWatchers(context, stopped);
+		})().catch(shared.NOOP);
+	}
+	async function settleBuffer(buffer) {
+		if (!buffer.hasAsync) return;
+		for (let item of buffer) try {
+			if (shared.isPromise(item)) item = await item;
+			if (!shared.isString(item)) await settleBuffer(item);
+		} catch {}
+	}
+	async function resolveTeleports(context) {
+		if (context.__teleportBuffers) {
+			context.teleports = context.teleports || {};
+			for (const key in context.__teleportBuffers) context.teleports[key] = await unrollBuffer$1(context.__teleportBuffers[key]);
+		}
+	}
+	var { isVNode } = Vue.ssrUtils;
+	Vue.initDirectivesForSSR();
+	exports.ssrIncludeBooleanAttr = shared.includeBooleanAttr;
+	exports.renderToString = renderToString;
+	exports.ssrGetDynamicModelProps = ssrGetDynamicModelProps;
+	exports.ssrInterpolate = ssrInterpolate;
+	exports.ssrLooseContain = ssrLooseContain;
+	exports.ssrLooseEqual = ssrLooseEqual;
+	exports.ssrRenderAttr = ssrRenderAttr;
+	exports.ssrRenderAttrs = ssrRenderAttrs;
+	exports.ssrRenderClass = ssrRenderClass;
+	exports.ssrRenderComponent = ssrRenderComponent;
+	exports.ssrRenderList = ssrRenderList;
+	exports.ssrRenderSlot = ssrRenderSlot;
+	exports.ssrRenderStyle = ssrRenderStyle;
+	exports.ssrRenderVNode = renderVNode;
+}));
+// node_modules/laravel-vite-plugin/inertia-helpers/index.js
+var import_server_renderer_cjs_prod = require_server_renderer_cjs_prod();
 async function resolvePageComponent(path, pages) {
-  for (const p2 of Array.isArray(path) ? path : [path]) {
-    const page2 = pages[p2];
-    if (typeof page2 === "undefined") {
-      continue;
-    }
-    return typeof page2 === "function" ? page2() : page2;
-  }
-  throw new Error(`Page not found: ${path}`);
+	for (const p of Array.isArray(path) ? path : [path]) {
+		const page = pages[p];
+		if (typeof page === "undefined") continue;
+		return typeof page === "function" ? page() : page;
+	}
+	throw new Error(`Page not found: ${path}`);
 }
-function t() {
-  return t = Object.assign ? Object.assign.bind() : function(t3) {
-    for (var e2 = 1; e2 < arguments.length; e2++) {
-      var o2 = arguments[e2];
-      for (var n2 in o2) ({}).hasOwnProperty.call(o2, n2) && (t3[n2] = o2[n2]);
-    }
-    return t3;
-  }, t.apply(null, arguments);
-}
-const e = String.prototype.replace, o = /%20/g, n = { RFC1738: function(t3) {
-  return e.call(t3, o, "+");
-}, RFC3986: function(t3) {
-  return String(t3);
-} };
-var r = "RFC3986";
-const i = Object.prototype.hasOwnProperty, s = Array.isArray, u = (function() {
-  const t3 = [];
-  for (let e2 = 0; e2 < 256; ++e2) t3.push("%" + ((e2 < 16 ? "0" : "") + e2.toString(16)).toUpperCase());
-  return t3;
-})(), l = function t2(e2, o2, n2) {
-  if (!o2) return e2;
-  if ("object" != typeof o2) {
-    if (s(e2)) e2.push(o2);
-    else {
-      if (!e2 || "object" != typeof e2) return [e2, o2];
-      (n2 && (n2.plainObjects || n2.allowPrototypes) || !i.call(Object.prototype, o2)) && (e2[o2] = true);
-    }
-    return e2;
-  }
-  if (!e2 || "object" != typeof e2) return [e2].concat(o2);
-  let r2 = e2;
-  return s(e2) && !s(o2) && (r2 = (function(t3, e3) {
-    const o3 = e3 && e3.plainObjects ? /* @__PURE__ */ Object.create(null) : {};
-    for (let e4 = 0; e4 < t3.length; ++e4) void 0 !== t3[e4] && (o3[e4] = t3[e4]);
-    return o3;
-  })(e2, n2)), s(e2) && s(o2) ? (o2.forEach(function(o3, r3) {
-    if (i.call(e2, r3)) {
-      const i2 = e2[r3];
-      i2 && "object" == typeof i2 && o3 && "object" == typeof o3 ? e2[r3] = t2(i2, o3, n2) : e2.push(o3);
-    } else e2[r3] = o3;
-  }), e2) : Object.keys(o2).reduce(function(e3, r3) {
-    const s2 = o2[r3];
-    return e3[r3] = i.call(e3, r3) ? t2(e3[r3], s2, n2) : s2, e3;
-  }, r2);
-}, c = 1024, a = function(t3, e2) {
-  return [].concat(t3, e2);
-}, f = function(t3, e2) {
-  if (s(t3)) {
-    const o2 = [];
-    for (let n2 = 0; n2 < t3.length; n2 += 1) o2.push(e2(t3[n2]));
-    return o2;
-  }
-  return e2(t3);
-}, p = Object.prototype.hasOwnProperty, y = { brackets: function(t3) {
-  return t3 + "[]";
-}, comma: "comma", indices: function(t3, e2) {
-  return t3 + "[" + e2 + "]";
-}, repeat: function(t3) {
-  return t3;
-} }, d = Array.isArray, h = Array.prototype.push, b = function(t3, e2) {
-  h.apply(t3, d(e2) ? e2 : [e2]);
-}, m = Date.prototype.toISOString, g = { addQueryPrefix: false, allowDots: false, allowEmptyArrays: false, arrayFormat: "indices", charset: "utf-8", charsetSentinel: false, delimiter: "&", encode: true, encodeDotInKeys: false, encoder: function(t3, e2, o2, n2, r2) {
-  if (0 === t3.length) return t3;
-  let i2 = t3;
-  if ("symbol" == typeof t3 ? i2 = Symbol.prototype.toString.call(t3) : "string" != typeof t3 && (i2 = String(t3)), "iso-8859-1" === o2) return escape(i2).replace(/%u[0-9a-f]{4}/gi, function(t4) {
-    return "%26%23" + parseInt(t4.slice(2), 16) + "%3B";
-  });
-  let s2 = "";
-  for (let t4 = 0; t4 < i2.length; t4 += c) {
-    const e3 = i2.length >= c ? i2.slice(t4, t4 + c) : i2, o3 = [];
-    for (let t5 = 0; t5 < e3.length; ++t5) {
-      let n3 = e3.charCodeAt(t5);
-      45 === n3 || 46 === n3 || 95 === n3 || 126 === n3 || n3 >= 48 && n3 <= 57 || n3 >= 65 && n3 <= 90 || n3 >= 97 && n3 <= 122 || "RFC1738" === r2 && (40 === n3 || 41 === n3) ? o3[o3.length] = e3.charAt(t5) : n3 < 128 ? o3[o3.length] = u[n3] : n3 < 2048 ? o3[o3.length] = u[192 | n3 >> 6] + u[128 | 63 & n3] : n3 < 55296 || n3 >= 57344 ? o3[o3.length] = u[224 | n3 >> 12] + u[128 | n3 >> 6 & 63] + u[128 | 63 & n3] : (t5 += 1, n3 = 65536 + ((1023 & n3) << 10 | 1023 & e3.charCodeAt(t5)), o3[o3.length] = u[240 | n3 >> 18] + u[128 | n3 >> 12 & 63] + u[128 | n3 >> 6 & 63] + u[128 | 63 & n3]);
-    }
-    s2 += o3.join("");
-  }
-  return s2;
-}, encodeValuesOnly: false, format: r, formatter: n[r], indices: false, serializeDate: function(t3) {
-  return m.call(t3);
-}, skipNulls: false, strictNullHandling: false }, w = {}, v = function(t3, e2, o2, n2, r2, i2, s2, u2, l2, c2, a2, p2, y2, h2, m2, j2, $2, E2) {
-  let O2 = t3, T2 = E2, R2 = 0, S2 = false;
-  for (; void 0 !== (T2 = T2.get(w)) && !S2; ) {
-    const e3 = T2.get(t3);
-    if (R2 += 1, void 0 !== e3) {
-      if (e3 === R2) throw new RangeError("Cyclic object value");
-      S2 = true;
-    }
-    void 0 === T2.get(w) && (R2 = 0);
-  }
-  if ("function" == typeof c2 ? O2 = c2(e2, O2) : O2 instanceof Date ? O2 = y2(O2) : "comma" === o2 && d(O2) && (O2 = f(O2, function(t4) {
-    return t4 instanceof Date ? y2(t4) : t4;
-  })), null === O2) {
-    if (i2) return l2 && !j2 ? l2(e2, g.encoder, $2, "key", h2) : e2;
-    O2 = "";
-  }
-  if ("string" == typeof (I2 = O2) || "number" == typeof I2 || "boolean" == typeof I2 || "symbol" == typeof I2 || "bigint" == typeof I2 || (function(t4) {
-    return !(!t4 || "object" != typeof t4 || !(t4.constructor && t4.constructor.isBuffer && t4.constructor.isBuffer(t4)));
-  })(O2)) return l2 ? [m2(j2 ? e2 : l2(e2, g.encoder, $2, "key", h2)) + "=" + m2(l2(O2, g.encoder, $2, "value", h2))] : [m2(e2) + "=" + m2(String(O2))];
-  var I2;
-  const A2 = [];
-  if (void 0 === O2) return A2;
-  let D2;
-  if ("comma" === o2 && d(O2)) j2 && l2 && (O2 = f(O2, l2)), D2 = [{ value: O2.length > 0 ? O2.join(",") || null : void 0 }];
-  else if (d(c2)) D2 = c2;
-  else {
-    const t4 = Object.keys(O2);
-    D2 = a2 ? t4.sort(a2) : t4;
-  }
-  const _ = u2 ? e2.replace(/\./g, "%2E") : e2, k = n2 && d(O2) && 1 === O2.length ? _ + "[]" : _;
-  if (r2 && d(O2) && 0 === O2.length) return k + "[]";
-  for (let e3 = 0; e3 < D2.length; ++e3) {
-    const f2 = D2[e3], g2 = "object" == typeof f2 && void 0 !== f2.value ? f2.value : O2[f2];
-    if (s2 && null === g2) continue;
-    const T3 = p2 && u2 ? f2.replace(/\./g, "%2E") : f2, S3 = d(O2) ? "function" == typeof o2 ? o2(k, T3) : k : k + (p2 ? "." + T3 : "[" + T3 + "]");
-    E2.set(t3, R2);
-    const I3 = /* @__PURE__ */ new WeakMap();
-    I3.set(w, E2), b(A2, v(g2, S3, o2, n2, r2, i2, s2, u2, "comma" === o2 && j2 && d(O2) ? null : l2, c2, a2, p2, y2, h2, m2, j2, $2, I3));
-  }
-  return A2;
-}, j = Object.prototype.hasOwnProperty, $ = Array.isArray, E = { allowDots: false, allowEmptyArrays: false, allowPrototypes: false, allowSparse: false, arrayLimit: 20, charset: "utf-8", charsetSentinel: false, comma: false, decodeDotInKeys: false, decoder: function(t3, e2, o2) {
-  const n2 = t3.replace(/\+/g, " ");
-  if ("iso-8859-1" === o2) return n2.replace(/%[0-9a-f]{2}/gi, unescape);
-  try {
-    return decodeURIComponent(n2);
-  } catch (t4) {
-    return n2;
-  }
-}, delimiter: "&", depth: 5, duplicates: "combine", ignoreQueryPrefix: false, interpretNumericEntities: false, parameterLimit: 1e3, parseArrays: true, plainObjects: false, strictNullHandling: false }, O = function(t3) {
-  return t3.replace(/&#(\d+);/g, function(t4, e2) {
-    return String.fromCharCode(parseInt(e2, 10));
-  });
-}, T = function(t3, e2) {
-  return t3 && "string" == typeof t3 && e2.comma && t3.indexOf(",") > -1 ? t3.split(",") : t3;
-}, R = function(t3, e2, o2, n2) {
-  if (!t3) return;
-  const r2 = o2.allowDots ? t3.replace(/\.([^.[]+)/g, "[$1]") : t3, i2 = /(\[[^[\]]*])/g;
-  let s2 = o2.depth > 0 && /(\[[^[\]]*])/.exec(r2);
-  const u2 = s2 ? r2.slice(0, s2.index) : r2, l2 = [];
-  if (u2) {
-    if (!o2.plainObjects && j.call(Object.prototype, u2) && !o2.allowPrototypes) return;
-    l2.push(u2);
-  }
-  let c2 = 0;
-  for (; o2.depth > 0 && null !== (s2 = i2.exec(r2)) && c2 < o2.depth; ) {
-    if (c2 += 1, !o2.plainObjects && j.call(Object.prototype, s2[1].slice(1, -1)) && !o2.allowPrototypes) return;
-    l2.push(s2[1]);
-  }
-  return s2 && l2.push("[" + r2.slice(s2.index) + "]"), (function(t4, e3, o3, n3) {
-    let r3 = n3 ? e3 : T(e3, o3);
-    for (let e4 = t4.length - 1; e4 >= 0; --e4) {
-      let n4;
-      const i3 = t4[e4];
-      if ("[]" === i3 && o3.parseArrays) n4 = o3.allowEmptyArrays && "" === r3 ? [] : [].concat(r3);
-      else {
-        n4 = o3.plainObjects ? /* @__PURE__ */ Object.create(null) : {};
-        const t5 = "[" === i3.charAt(0) && "]" === i3.charAt(i3.length - 1) ? i3.slice(1, -1) : i3, e5 = o3.decodeDotInKeys ? t5.replace(/%2E/g, ".") : t5, s3 = parseInt(e5, 10);
-        o3.parseArrays || "" !== e5 ? !isNaN(s3) && i3 !== e5 && String(s3) === e5 && s3 >= 0 && o3.parseArrays && s3 <= o3.arrayLimit ? (n4 = [], n4[s3] = r3) : "__proto__" !== e5 && (n4[e5] = r3) : n4 = { 0: r3 };
-      }
-      r3 = n4;
-    }
-    return r3;
-  })(l2, e2, o2, n2);
+// vendor/tightenco/ziggy/dist/index.js
+var e = String.prototype.replace;
+var t = /%20/g;
+var n = {
+	RFC1738: `RFC1738`,
+	RFC3986: `RFC3986`
 };
-function S(t3, e2) {
-  const o2 = /* @__PURE__ */ (function(t4) {
-    return E;
-  })();
-  if ("" === t3 || null == t3) return o2.plainObjects ? /* @__PURE__ */ Object.create(null) : {};
-  const n2 = "string" == typeof t3 ? (function(t4, e3) {
-    const o3 = { __proto__: null }, n3 = (e3.ignoreQueryPrefix ? t4.replace(/^\?/, "") : t4).split(e3.delimiter, Infinity === e3.parameterLimit ? void 0 : e3.parameterLimit);
-    let r3, i3 = -1, s2 = e3.charset;
-    if (e3.charsetSentinel) for (r3 = 0; r3 < n3.length; ++r3) 0 === n3[r3].indexOf("utf8=") && ("utf8=%E2%9C%93" === n3[r3] ? s2 = "utf-8" : "utf8=%26%2310003%3B" === n3[r3] && (s2 = "iso-8859-1"), i3 = r3, r3 = n3.length);
-    for (r3 = 0; r3 < n3.length; ++r3) {
-      if (r3 === i3) continue;
-      const t5 = n3[r3], u2 = t5.indexOf("]="), l2 = -1 === u2 ? t5.indexOf("=") : u2 + 1;
-      let c2, p2;
-      -1 === l2 ? (c2 = e3.decoder(t5, E.decoder, s2, "key"), p2 = e3.strictNullHandling ? null : "") : (c2 = e3.decoder(t5.slice(0, l2), E.decoder, s2, "key"), p2 = f(T(t5.slice(l2 + 1), e3), function(t6) {
-        return e3.decoder(t6, E.decoder, s2, "value");
-      })), p2 && e3.interpretNumericEntities && "iso-8859-1" === s2 && (p2 = O(p2)), t5.indexOf("[]=") > -1 && (p2 = $(p2) ? [p2] : p2);
-      const y2 = j.call(o3, c2);
-      y2 && "combine" === e3.duplicates ? o3[c2] = a(o3[c2], p2) : y2 && "last" !== e3.duplicates || (o3[c2] = p2);
-    }
-    return o3;
-  })(t3, o2) : t3;
-  let r2 = o2.plainObjects ? /* @__PURE__ */ Object.create(null) : {};
-  const i2 = Object.keys(n2);
-  for (let e3 = 0; e3 < i2.length; ++e3) {
-    const s2 = i2[e3], u2 = R(s2, n2[s2], o2, "string" == typeof t3);
-    r2 = l(r2, u2, o2);
-  }
-  return true === o2.allowSparse ? r2 : (function(t4) {
-    const e3 = [{ obj: { o: t4 }, prop: "o" }], o3 = [];
-    for (let t5 = 0; t5 < e3.length; ++t5) {
-      const n3 = e3[t5], r3 = n3.obj[n3.prop], i3 = Object.keys(r3);
-      for (let t6 = 0; t6 < i3.length; ++t6) {
-        const n4 = i3[t6], s2 = r3[n4];
-        "object" == typeof s2 && null !== s2 && -1 === o3.indexOf(s2) && (e3.push({ obj: r3, prop: n4 }), o3.push(s2));
-      }
-    }
-    return (function(t5) {
-      for (; t5.length > 1; ) {
-        const e4 = t5.pop(), o4 = e4.obj[e4.prop];
-        if (s(o4)) {
-          const t6 = [];
-          for (let e5 = 0; e5 < o4.length; ++e5) void 0 !== o4[e5] && t6.push(o4[e5]);
-          e4.obj[e4.prop] = t6;
-        }
-      }
-    })(e3), t4;
-  })(r2);
-}
-class I {
-  constructor(t3, e2, o2) {
-    var n2, r2;
-    this.name = t3, this.definition = e2, this.bindings = null != (n2 = e2.bindings) ? n2 : {}, this.wheres = null != (r2 = e2.wheres) ? r2 : {}, this.config = o2;
-  }
-  get template() {
-    const t3 = `${this.origin}/${this.definition.uri}`.replace(/\/+$/, "");
-    return "" === t3 ? "/" : t3;
-  }
-  get origin() {
-    return this.config.absolute ? this.definition.domain ? `${this.config.url.match(/^\w+:\/\//)[0]}${this.definition.domain}${this.config.port ? `:${this.config.port}` : ""}` : this.config.url : "";
-  }
-  get parameterSegments() {
-    var t3, e2;
-    return null != (t3 = null == (e2 = this.template.match(/{[^}?]+\??}/g)) ? void 0 : e2.map((t4) => ({ name: t4.replace(/{|\??}/g, ""), required: !/\?}$/.test(t4) }))) ? t3 : [];
-  }
-  matchesUrl(t3) {
-    var e2;
-    if (!this.definition.methods.includes("GET")) return false;
-    const o2 = this.template.replace(/[.*+$()[\]]/g, "\\$&").replace(/(\/?){([^}?]*)(\??)}/g, (t4, e3, o3, n3) => {
-      var r3;
-      const i3 = `(?<${o3}>${(null == (r3 = this.wheres[o3]) ? void 0 : r3.replace(/(^\^)|(\$$)/g, "")) || "[^/?]+"})`;
-      return n3 ? `(${e3}${i3})?` : `${e3}${i3}`;
-    }).replace(/^\w+:\/\//, ""), [n2, r2] = t3.replace(/^\w+:\/\//, "").split("?"), i2 = null != (e2 = new RegExp(`^${o2}/?$`).exec(n2)) ? e2 : new RegExp(`^${o2}/?$`).exec(decodeURI(n2));
-    if (i2) {
-      for (const t4 in i2.groups) i2.groups[t4] = "string" == typeof i2.groups[t4] ? decodeURIComponent(i2.groups[t4]) : i2.groups[t4];
-      return { params: i2.groups, query: S(r2) };
-    }
-    return false;
-  }
-  compile(t3) {
-    return this.parameterSegments.length ? this.template.replace(/{([^}?]+)(\??)}/g, (e2, o2, n2) => {
-      var r2, i2;
-      if (!n2 && [null, void 0].includes(t3[o2])) throw new Error(`Ziggy error: '${o2}' parameter is required for route '${this.name}'.`);
-      if (this.wheres[o2] && !new RegExp(`^${n2 ? `(${this.wheres[o2]})?` : this.wheres[o2]}$`).test(null != (i2 = t3[o2]) ? i2 : "")) throw new Error(`Ziggy error: '${o2}' parameter '${t3[o2]}' does not match required format '${this.wheres[o2]}' for route '${this.name}'.`);
-      return encodeURI(null != (r2 = t3[o2]) ? r2 : "").replace(/%7C/g, "|").replace(/%25/g, "%").replace(/\$/g, "%24");
-    }).replace(this.config.absolute ? /(\.[^/]+?)(\/\/)/ : /(^)(\/\/)/, "$1/").replace(/\/+$/, "") : this.template;
-  }
-}
-class A extends String {
-  constructor(e2, o2, n2 = true, r2) {
-    if (super(), this.t = null != r2 ? r2 : "undefined" != typeof Ziggy ? Ziggy : null == globalThis ? void 0 : globalThis.Ziggy, !this.t && "undefined" != typeof document && document.getElementById("ziggy-routes-json") && (globalThis.Ziggy = JSON.parse(document.getElementById("ziggy-routes-json").textContent), this.t = globalThis.Ziggy), this.t = t({}, this.t, { absolute: n2 }), e2) {
-      if (!this.t.routes[e2]) throw new Error(`Ziggy error: route '${e2}' is not in the route list.`);
-      this.i = new I(e2, this.t.routes[e2], this.t), this.u = this.l(o2);
-    }
-  }
-  toString() {
-    const e2 = Object.keys(this.u).filter((t3) => !this.i.parameterSegments.some(({ name: e3 }) => e3 === t3)).filter((t3) => "_query" !== t3).reduce((e3, o2) => t({}, e3, { [o2]: this.u[o2] }), {});
-    return this.i.compile(this.u) + (function(t3, e3) {
-      let o2 = t3;
-      const i2 = (function(t4) {
-        if (!t4) return g;
-        if (void 0 !== t4.allowEmptyArrays && "boolean" != typeof t4.allowEmptyArrays) throw new TypeError("`allowEmptyArrays` option can only be `true` or `false`, when provided");
-        if (void 0 !== t4.encodeDotInKeys && "boolean" != typeof t4.encodeDotInKeys) throw new TypeError("`encodeDotInKeys` option can only be `true` or `false`, when provided");
-        if (null != t4.encoder && "function" != typeof t4.encoder) throw new TypeError("Encoder has to be a function.");
-        const e4 = t4.charset || g.charset;
-        if (void 0 !== t4.charset && "utf-8" !== t4.charset && "iso-8859-1" !== t4.charset) throw new TypeError("The charset option must be either utf-8, iso-8859-1, or undefined");
-        let o3 = r;
-        if (void 0 !== t4.format) {
-          if (!p.call(n, t4.format)) throw new TypeError("Unknown format option provided.");
-          o3 = t4.format;
-        }
-        const i3 = n[o3];
-        let s3, u3 = g.filter;
-        if (("function" == typeof t4.filter || d(t4.filter)) && (u3 = t4.filter), s3 = t4.arrayFormat in y ? t4.arrayFormat : "indices" in t4 ? t4.indices ? "indices" : "repeat" : g.arrayFormat, "commaRoundTrip" in t4 && "boolean" != typeof t4.commaRoundTrip) throw new TypeError("`commaRoundTrip` must be a boolean, or absent");
-        return { addQueryPrefix: "boolean" == typeof t4.addQueryPrefix ? t4.addQueryPrefix : g.addQueryPrefix, allowDots: void 0 === t4.allowDots ? true === t4.encodeDotInKeys || g.allowDots : !!t4.allowDots, allowEmptyArrays: "boolean" == typeof t4.allowEmptyArrays ? !!t4.allowEmptyArrays : g.allowEmptyArrays, arrayFormat: s3, charset: e4, charsetSentinel: "boolean" == typeof t4.charsetSentinel ? t4.charsetSentinel : g.charsetSentinel, commaRoundTrip: t4.commaRoundTrip, delimiter: void 0 === t4.delimiter ? g.delimiter : t4.delimiter, encode: "boolean" == typeof t4.encode ? t4.encode : g.encode, encodeDotInKeys: "boolean" == typeof t4.encodeDotInKeys ? t4.encodeDotInKeys : g.encodeDotInKeys, encoder: "function" == typeof t4.encoder ? t4.encoder : g.encoder, encodeValuesOnly: "boolean" == typeof t4.encodeValuesOnly ? t4.encodeValuesOnly : g.encodeValuesOnly, filter: u3, format: o3, formatter: i3, serializeDate: "function" == typeof t4.serializeDate ? t4.serializeDate : g.serializeDate, skipNulls: "boolean" == typeof t4.skipNulls ? t4.skipNulls : g.skipNulls, sort: "function" == typeof t4.sort ? t4.sort : null, strictNullHandling: "boolean" == typeof t4.strictNullHandling ? t4.strictNullHandling : g.strictNullHandling };
-      })(e3);
-      let s2, u2;
-      "function" == typeof i2.filter ? (u2 = i2.filter, o2 = u2("", o2)) : d(i2.filter) && (u2 = i2.filter, s2 = u2);
-      const l2 = [];
-      if ("object" != typeof o2 || null === o2) return "";
-      const c2 = y[i2.arrayFormat], a2 = "comma" === c2 && i2.commaRoundTrip;
-      s2 || (s2 = Object.keys(o2)), i2.sort && s2.sort(i2.sort);
-      const f2 = /* @__PURE__ */ new WeakMap();
-      for (let t4 = 0; t4 < s2.length; ++t4) {
-        const e4 = s2[t4];
-        i2.skipNulls && null === o2[e4] || b(l2, v(o2[e4], e4, c2, a2, i2.allowEmptyArrays, i2.strictNullHandling, i2.skipNulls, i2.encodeDotInKeys, i2.encode ? i2.encoder : null, i2.filter, i2.sort, i2.allowDots, i2.serializeDate, i2.format, i2.formatter, i2.encodeValuesOnly, i2.charset, f2));
-      }
-      const h2 = l2.join(i2.delimiter);
-      let m2 = true === i2.addQueryPrefix ? "?" : "";
-      return i2.charsetSentinel && (m2 += "iso-8859-1" === i2.charset ? "utf8=%26%2310003%3B&" : "utf8=%E2%9C%93&"), h2.length > 0 ? m2 + h2 : "";
-    })(t({}, e2, this.u._query), { addQueryPrefix: true, arrayFormat: "indices", encodeValuesOnly: true, skipNulls: true, encoder: (t3, e3) => "boolean" == typeof t3 ? Number(t3) : e3(t3) });
-  }
-  p(e2) {
-    e2 ? this.t.absolute && e2.startsWith("/") && (e2 = this.h().host + e2) : e2 = this.m();
-    let o2 = {};
-    const [n2, r2] = Object.entries(this.t.routes).find(([t3, n3]) => o2 = new I(t3, n3, this.t).matchesUrl(e2)) || [void 0, void 0];
-    return t({ name: n2 }, o2, { route: r2 });
-  }
-  m() {
-    const { host: t3, pathname: e2, search: o2 } = this.h();
-    return (this.t.absolute ? t3 + e2 : e2.replace(this.t.url.replace(/^\w*:\/\/[^/]+/, ""), "").replace(/^\/+/, "/")) + o2;
-  }
-  current(e2, o2) {
-    const { name: n2, params: r2, query: i2, route: s2 } = this.p();
-    if (!e2) return n2;
-    const u2 = new RegExp(`^${e2.replace(/\./g, "\\.").replace(/\*/g, ".*")}$`).test(n2);
-    if ([null, void 0].includes(o2) || !u2) return u2;
-    const l2 = new I(n2, s2, this.t);
-    o2 = this.l(o2, l2);
-    const c2 = t({}, r2, i2);
-    if (Object.values(o2).every((t3) => !t3) && !Object.values(c2).some((t3) => void 0 !== t3)) return true;
-    const a2 = (t3, e3) => Object.entries(t3).every(([t4, o3]) => Array.isArray(o3) && Array.isArray(e3[t4]) ? o3.every((o4) => e3[t4].includes(o4) || e3[t4].includes(decodeURIComponent(o4))) : "object" == typeof o3 && "object" == typeof e3[t4] && null !== o3 && null !== e3[t4] ? a2(o3, e3[t4]) : e3[t4] == o3 || e3[t4] == decodeURIComponent(o3));
-    return a2(o2, c2);
-  }
-  h() {
-    var t3, e2, o2, n2, r2, i2;
-    const { host: s2 = "", pathname: u2 = "", search: l2 = "" } = "undefined" != typeof window ? window.location : {};
-    return { host: null != (t3 = null == (e2 = this.t.location) ? void 0 : e2.host) ? t3 : s2, pathname: null != (o2 = null == (n2 = this.t.location) ? void 0 : n2.pathname) ? o2 : u2, search: null != (r2 = null == (i2 = this.t.location) ? void 0 : i2.search) ? r2 : l2 };
-  }
-  get params() {
-    const { params: e2, query: o2 } = this.p();
-    return t({}, e2, o2);
-  }
-  get routeParams() {
-    return this.p().params;
-  }
-  get queryParams() {
-    return this.p().query;
-  }
-  has(t3) {
-    return this.t.routes.hasOwnProperty(t3);
-  }
-  l(e2 = {}, o2 = this.i) {
-    null != e2 || (e2 = {}), e2 = ["string", "number"].includes(typeof e2) ? [e2] : e2;
-    const n2 = o2.parameterSegments.filter(({ name: t3 }) => !this.t.defaults[t3]);
-    return Array.isArray(e2) ? e2 = e2.reduce((e3, o3, r2) => t({}, e3, n2[r2] ? { [n2[r2].name]: o3 } : "object" == typeof o3 ? o3 : { [o3]: "" }), {}) : 1 !== n2.length || e2[n2[0].name] || !e2.hasOwnProperty(Object.values(o2.bindings)[0]) && !e2.hasOwnProperty("id") || (e2 = { [n2[0].name]: e2 }), t({}, this.v(o2), this.j(e2, o2));
-  }
-  v(e2) {
-    return e2.parameterSegments.filter(({ name: t3 }) => this.t.defaults[t3]).reduce((e3, { name: o2 }, n2) => t({}, e3, { [o2]: this.t.defaults[o2] }), {});
-  }
-  j(e2, { bindings: o2, parameterSegments: n2 }) {
-    return Object.entries(e2).reduce((e3, [r2, i2]) => {
-      if (!i2 || "object" != typeof i2 || Array.isArray(i2) || !n2.some(({ name: t3 }) => t3 === r2)) return t({}, e3, { [r2]: i2 });
-      if (!i2.hasOwnProperty(o2[r2])) {
-        if (!i2.hasOwnProperty("id")) throw new Error(`Ziggy error: object passed as '${r2}' parameter is missing route model binding key '${o2[r2]}'.`);
-        o2[r2] = "id";
-      }
-      return t({}, e3, { [r2]: i2[o2[r2]] });
-    }, {});
-  }
-  valueOf() {
-    return this.toString();
-  }
-}
-function D(t3, e2, o2, n2) {
-  const r2 = new A(t3, e2, o2, n2);
-  return t3 ? r2.toString() : r2;
-}
-const appName = "Matos";
-const inertiaPort = 13714;
-createServer(
-  (page2) => createInertiaApp({
-    page: page2,
-    render: serverRenderer_cjs_prodExports.renderToString,
-    title: (title) => `${title} - ${appName}`,
-    resolve: (name) => resolvePageComponent(`./pages/${name}.vue`, /* @__PURE__ */ Object.assign({ "./pages/Admin/Categories/Create.vue": () => import("./assets/Create-CtB7flXU.js"), "./pages/Admin/Categories/Edit.vue": () => import("./assets/Edit-D_zQuYz6.js"), "./pages/Admin/Categories/Index.vue": () => import("./assets/Index-Cd2qOFJ9.js"), "./pages/Admin/Dashboard.vue": () => import("./assets/Dashboard-Ca3q7nKZ.js"), "./pages/Admin/Users/Create.vue": () => import("./assets/Create-B0ePyMki.js"), "./pages/Admin/Users/Edit.vue": () => import("./assets/Edit-T7JzkSRw.js"), "./pages/Admin/Users/Index.vue": () => import("./assets/Index-CQyM04FC.js"), "./pages/App/Dashboard.vue": () => import("./assets/Dashboard-B5dTRcu6.js"), "./pages/App/Organizations/Calendar/Index.vue": () => import("./assets/Index-BoOa5ByF.js"), "./pages/App/Organizations/Create.vue": () => import("./assets/Create-Df0chYLu.js"), "./pages/App/Organizations/Equipments/Create.vue": () => import("./assets/Create-Bt0yfUx9.js"), "./pages/App/Organizations/Equipments/Edit.vue": () => import("./assets/Edit-9262o__X.js"), "./pages/App/Organizations/Equipments/Index.vue": () => import("./assets/Index-DNNGxeB5.js"), "./pages/App/Organizations/Index.vue": () => import("./assets/Index-C3zXaNTd.js"), "./pages/App/Organizations/Reservations/In/Edit.vue": () => import("./assets/Edit-C2p5HhyE.js"), "./pages/App/Organizations/Reservations/In/Index.vue": () => import("./assets/Index-CfoAoZsp.js"), "./pages/App/Organizations/Reservations/Layout.vue": () => import("./assets/Layout-CsiAtby1.js"), "./pages/App/Organizations/Reservations/Out/Create.vue": () => import("./assets/Create-DcNd-Wfi.js"), "./pages/App/Organizations/Reservations/Out/Edit.vue": () => import("./assets/Edit-OxFsmWJN.js"), "./pages/App/Organizations/Reservations/Out/Index.vue": () => import("./assets/Index-CG1qy5Ac.js"), "./pages/App/Organizations/Settings/Depots/Create.vue": () => import("./assets/Create-CJ-2tkpm.js"), "./pages/App/Organizations/Settings/Depots/Edit.vue": () => import("./assets/Edit-EmjQ-dGJ.js"), "./pages/App/Organizations/Settings/Depots/Index.vue": () => import("./assets/Index-GMzWv3oZ.js"), "./pages/App/Organizations/Settings/Edit.vue": () => import("./assets/Edit-2-AZ65_h.js"), "./pages/App/Organizations/Settings/Members/Index.vue": () => import("./assets/Index-C-1HOPzw.js"), "./pages/App/Organizations/Settings/Partials/DeleteOrganization.vue": () => import("./assets/DeleteOrganization-B5SOctyO.js"), "./pages/App/Organizations/Settings/Partials/DepotsManagement.vue": () => import("./assets/DepotsManagement-nUQY1yFO.js"), "./pages/App/Organizations/Settings/Partials/GeneralForm.vue": () => import("./assets/GeneralForm-fQm7P6qQ.js"), "./pages/App/Organizations/Settings/Partials/MembersManagement.vue": () => import("./assets/MembersManagement-CUwVQuM6.js"), "./pages/App/Organizations/Show.vue": () => import("./assets/Show-sjFQrEzN.js"), "./pages/Conditions.vue": () => import("./assets/Conditions-D_EBDzfB.js"), "./pages/Discover.vue": () => import("./assets/Discover-DKJtLTht.js"), "./pages/Faq.vue": () => import("./assets/Faq-CDh2Ere5.js"), "./pages/HowItWorks.vue": () => import("./assets/HowItWorks-BjdnZ9TI.js"), "./pages/Privacy.vue": () => import("./assets/Privacy-DlP2VZzd.js"), "./pages/Public/Carts/Show.vue": () => import("./assets/Show-r9cvY4Ds.js"), "./pages/Public/Checkout/Index.vue": () => import("./assets/Index-l3ofRiiW.js"), "./pages/Public/Checkout/Success.vue": () => import("./assets/Success-TUGTqp3X.js"), "./pages/Public/Equipments/Show.vue": () => import("./assets/Show-D0gyKcMt.js"), "./pages/Public/Home.vue": () => import("./assets/Home-CjqRKCjW.js"), "./pages/Terms.vue": () => import("./assets/Terms-DrXIMjlM.js"), "./pages/auth/ConfirmPassword.vue": () => import("./assets/ConfirmPassword-CTTYcvie.js"), "./pages/auth/ForgotPassword.vue": () => import("./assets/ForgotPassword-Cu1wATob.js"), "./pages/auth/Login.vue": () => import("./assets/Login-1F2BFrpP.js"), "./pages/auth/Register.vue": () => import("./assets/Register-Cli2ozif.js"), "./pages/auth/ResetPassword.vue": () => import("./assets/ResetPassword-nTczaZ7u.js"), "./pages/auth/VerifyEmail.vue": () => import("./assets/VerifyEmail-2FCw1JyI.js"), "./pages/settings/Appearance.vue": () => import("./assets/Appearance-D15ay4dh.js"), "./pages/settings/Password.vue": () => import("./assets/Password-Db44TKnc.js"), "./pages/settings/Profile.vue": () => import("./assets/Profile-Bs2ntEez.js") })),
-    setup({ App: App2, props, plugin: plugin2 }) {
-      const app = vueExports.createSSRApp({ render: () => vueExports.h(App2, props) });
-      const ziggyConfig = {
-        ...page2.props.ziggy,
-        location: new URL(page2.props.ziggy.location)
-      };
-      const route = (name, params, absolute) => D(name, params, absolute, ziggyConfig);
-      app.config.globalProperties.route = route;
-      if (typeof window === "undefined") {
-        global.route = route;
-      }
-      app.use(plugin2);
-      return app;
-    }
-  }),
-  { port: inertiaPort }
-);
-export {
-  usePage as a,
-  head_default as h,
-  link_default as l,
-  serverRenderer_cjs_prodExports as s,
-  useForm as u,
-  vueExports as v,
-  whenVisible_default as w
+var r = {
+	RFC1738: function(n) {
+		return e.call(n, t, `+`);
+	},
+	RFC3986: function(e) {
+		return String(e);
+	}
 };
+var i = n.RFC1738;
+n.RFC3986;
+var a = n.RFC3986;
+var o = Object.prototype.hasOwnProperty;
+var s = Array.isArray;
+var c = /* @__PURE__ */ new WeakMap();
+var l = function(e, t) {
+	return c.set(e, t), e;
+};
+function u(e) {
+	return c.has(e);
+}
+var d = function(e) {
+	return c.get(e);
+};
+var f = function(e, t) {
+	c.set(e, t);
+};
+var p = (function() {
+	let e = [];
+	for (let t = 0; t < 256; ++t) e.push(`%` + ((t < 16 ? `0` : ``) + t.toString(16)).toUpperCase());
+	return e;
+})();
+var m = function(e) {
+	for (; e.length > 1;) {
+		let t = e.pop(), n = t.obj[t.prop];
+		if (s(n)) {
+			let e = [];
+			for (let t = 0; t < n.length; ++t) n[t] !== void 0 && e.push(n[t]);
+			t.obj[t.prop] = e;
+		}
+	}
+};
+var h$1 = function(e, t) {
+	let n = t && t.plainObjects ? Object.create(null) : {};
+	for (let t = 0; t < e.length; ++t) e[t] !== void 0 && (n[t] = e[t]);
+	return n;
+};
+var g = function e(t, n, r) {
+	if (!n) return t;
+	if (typeof n != `object`) {
+		if (s(t)) t.push(n);
+		else if (t && typeof t == `object`) {
+			if (u(t)) {
+				var i = d(t) + 1;
+				t[i] = n, f(t, i);
+			} else (r && (r.plainObjects || r.allowPrototypes) || !o.call(Object.prototype, n)) && (t[n] = !0);
+		} else return [t, n];
+		return t;
+	}
+	if (!t || typeof t != `object`) {
+		if (u(n)) {
+			for (var a = Object.keys(n), c = r && r.plainObjects ? {
+				__proto__: null,
+				0: t
+			} : { 0: t }, p = 0; p < a.length; p++) {
+				var m = parseInt(a[p], 10);
+				c[m + 1] = n[a[p]];
+			}
+			return l(c, d(n) + 1);
+		}
+		return [t].concat(n);
+	}
+	let g = t;
+	return s(t) && !s(n) && (g = h$1(t, r)), s(t) && s(n) ? (n.forEach(function(n, i) {
+		if (o.call(t, i)) {
+			let a = t[i];
+			a && typeof a == `object` && n && typeof n == `object` ? t[i] = e(a, n, r) : t.push(n);
+		} else t[i] = n;
+	}), t) : Object.keys(n).reduce(function(t, i) {
+		let a = n[i];
+		if (o.call(t, i) && (a = e(t[i], a, r)), i === `__proto__` ? Object.defineProperty(t, i, {
+			configurable: !0,
+			enumerable: !0,
+			value: a,
+			writable: !0
+		}) : t[i] = a, u(n) && !u(t) && l(t, d(n)), u(t)) {
+			let e = parseInt(i, 10);
+			String(e) === i && e >= 0 && e > d(t) && f(t, e);
+		}
+		return t;
+	}, g);
+};
+var _ = function(e) {
+	let t = e.replace(/\+/g, ` `);
+	try {
+		return decodeURIComponent(t);
+	} catch (e) {
+		return t;
+	}
+};
+var v = 1024;
+var y = function(e, t, n, r) {
+	if (e.length === 0) return e;
+	let a = e;
+	typeof e == `symbol` ? a = Symbol.prototype.toString.call(e) : typeof e != `string` && (a = String(e));
+	let o = ``;
+	for (let e = 0; e < a.length; e += v) {
+		let t = a.length >= v ? a.slice(e, e + v) : a;
+		if (e + v < a.length) {
+			let n = t.charCodeAt(t.length - 1);
+			n >= 55296 && n <= 56319 && (t = t.slice(0, -1), --e);
+		}
+		let n = [];
+		for (let e = 0; e < t.length; ++e) {
+			let a = t.charCodeAt(e);
+			a === 45 || a === 46 || a === 95 || a === 126 || a >= 48 && a <= 57 || a >= 65 && a <= 90 || a >= 97 && a <= 122 || r === i && (a === 40 || a === 41) ? n[n.length] = t.charAt(e) : a < 128 ? n[n.length] = p[a] : a < 2048 ? n[n.length] = p[192 | a >> 6] + p[128 | a & 63] : a < 55296 || a >= 57344 ? n[n.length] = p[224 | a >> 12] + p[128 | a >> 6 & 63] + p[128 | a & 63] : (e += 1, a = 65536 + ((a & 1023) << 10 | t.charCodeAt(e) & 1023), n[n.length] = p[240 | a >> 18] + p[128 | a >> 12 & 63] + p[128 | a >> 6 & 63] + p[128 | a & 63]);
+		}
+		o += n.join(``);
+	}
+	return o;
+};
+var b = function(e) {
+	let t = [{
+		obj: { o: e },
+		prop: `o`
+	}], n = /* @__PURE__ */ new WeakMap();
+	for (let e = 0; e < t.length; ++e) {
+		let r = t[e], i = r.obj[r.prop], a = Object.keys(i);
+		for (let e = 0; e < a.length; ++e) {
+			let r = a[e], o = i[r];
+			typeof o == `object` && o && !n.has(o) && (t.push({
+				obj: i,
+				prop: r
+			}), n.set(o, !0));
+		}
+	}
+	return m(t), e;
+};
+var x = function(e) {
+	return Object.prototype.toString.call(e) === `[object RegExp]`;
+};
+var S = function(e) {
+	return !e || typeof e != `object` ? !1 : !!(e.constructor && typeof e.constructor.isBuffer == `function` && e.constructor.isBuffer(e));
+};
+var C = function(e, t, n, r) {
+	if (u(e)) {
+		var i = d(e) + 1;
+		return e[i] = t, f(e, i), e;
+	}
+	var a = [].concat(e, t);
+	return a.length > n ? l(h$1(a, { plainObjects: r }), a.length - 1) : a;
+};
+var w = function(e, t) {
+	if (s(e)) {
+		let n = [];
+		for (let r = 0; r < e.length; r += 1) n.push(t(e[r]));
+		return n;
+	}
+	return t(e);
+};
+var T = Object.prototype.hasOwnProperty;
+var E = {
+	brackets: function(e) {
+		return e + `[]`;
+	},
+	comma: `comma`,
+	indices: function(e, t) {
+		return e + `[` + t + `]`;
+	},
+	repeat: function(e) {
+		return e;
+	}
+};
+var D = Array.isArray;
+var O = Array.prototype.push;
+var k = function(e, t) {
+	O.apply(e, D(t) ? t : [t]);
+};
+var A = Date.prototype.toISOString;
+var j = a;
+var M = {
+	addQueryPrefix: !1,
+	allowDots: !1,
+	allowEmptyArrays: !1,
+	arrayFormat: `indices`,
+	delimiter: `&`,
+	encode: !0,
+	encodeDotInKeys: !1,
+	encoder: y,
+	encodeValuesOnly: !1,
+	format: j,
+	formatter: r[j],
+	indices: !1,
+	serializeDate: function(e) {
+		return A.call(e);
+	},
+	skipNulls: !1,
+	strictNullHandling: !1
+};
+var N = function(e) {
+	return typeof e == `string` || typeof e == `number` || typeof e == `boolean` || typeof e == `symbol` || typeof e == `bigint`;
+};
+var P = {};
+var F = function(e, t, n, r, i, a, o, s, c, l, u, d, f, p, m, h, g) {
+	let _ = e, v = g, y = 0, b = !1;
+	for (; (v = v.get(P)) !== void 0 && !b;) {
+		let t = v.get(e);
+		if (y += 1, t !== void 0) {
+			if (t === y) throw RangeError(`Cyclic object value`);
+			b = !0;
+		}
+		v.get(P) === void 0 && (y = 0);
+	}
+	if (typeof l == `function` ? _ = l(t, _) : _ instanceof Date ? _ = f(_) : n === `comma` && D(_) && (_ = w(_, function(e) {
+		return e instanceof Date ? f(e) : e;
+	})), _ === null) {
+		if (a) return c && !h ? c(t, M.encoder, `key`, p) : t;
+		_ = ``;
+	}
+	if (N(_) || S(_)) return c ? [m(h ? t : c(t, M.encoder, `key`, p)) + `=` + m(c(_, M.encoder, `value`, p))] : [m(t) + `=` + m(String(_))];
+	let x = [];
+	if (_ === void 0) return x;
+	let C;
+	if (n === `comma` && D(_)) h && c && (_ = w(_, function(e) {
+		return e == null ? e : c(e);
+	})), C = [{ value: _.length > 0 ? _.join(`,`) || null : void 0 }];
+	else if (D(l)) C = l;
+	else {
+		let e = Object.keys(_);
+		C = u ? e.sort(u) : e;
+	}
+	let T = s ? t.replace(/\./g, `%2E`) : t, E = r && D(_) && _.length === 1 ? T + `[]` : T;
+	if (i && D(_) && _.length === 0) return E + `[]`;
+	for (let t = 0; t < C.length; ++t) {
+		let v = C[t], b = typeof v == `object` && v.value !== void 0 ? v.value : _[v];
+		if (o && b === null) continue;
+		let S = d && s ? v.replace(/\./g, `%2E`) : v, w = D(_) ? typeof n == `function` ? n(E, S) : E : E + (d ? `.` + S : `[` + S + `]`);
+		g.set(e, y);
+		let T = /* @__PURE__ */ new WeakMap();
+		T.set(P, g), k(x, F(b, w, n, r, i, a, o, s, n === `comma` && h && D(_) ? null : c, l, u, d, f, p, m, h, T));
+	}
+	return x;
+};
+var I = function(e) {
+	if (!e) return M;
+	if (e.allowEmptyArrays !== void 0 && typeof e.allowEmptyArrays != `boolean`) throw TypeError("`allowEmptyArrays` option can only be `true` or `false`, when provided");
+	if (e.encodeDotInKeys !== void 0 && typeof e.encodeDotInKeys != `boolean`) throw TypeError("`encodeDotInKeys` option can only be `true` or `false`, when provided");
+	if (e.encoder !== null && e.encoder !== void 0 && typeof e.encoder != `function`) throw TypeError(`Encoder has to be a function.`);
+	let t = a;
+	if (e.format !== void 0) {
+		if (!T.call(r, e.format)) throw TypeError(`Unknown format option provided.`);
+		t = e.format;
+	}
+	let n = r[t], i = M.filter;
+	(typeof e.filter == `function` || D(e.filter)) && (i = e.filter);
+	let o;
+	if (o = e.arrayFormat in E ? e.arrayFormat : `indices` in e ? e.indices ? `indices` : `repeat` : M.arrayFormat, `commaRoundTrip` in e && typeof e.commaRoundTrip != `boolean`) throw TypeError("`commaRoundTrip` must be a boolean, or absent");
+	let s = e.allowDots === void 0 ? e.encodeDotInKeys === !0 || M.allowDots : !!e.allowDots;
+	return {
+		addQueryPrefix: typeof e.addQueryPrefix == `boolean` ? e.addQueryPrefix : M.addQueryPrefix,
+		allowDots: s,
+		allowEmptyArrays: typeof e.allowEmptyArrays == `boolean` ? !!e.allowEmptyArrays : M.allowEmptyArrays,
+		arrayFormat: o,
+		commaRoundTrip: e.commaRoundTrip,
+		delimiter: e.delimiter === void 0 ? M.delimiter : e.delimiter,
+		encode: typeof e.encode == `boolean` ? e.encode : M.encode,
+		encodeDotInKeys: typeof e.encodeDotInKeys == `boolean` ? e.encodeDotInKeys : M.encodeDotInKeys,
+		encoder: typeof e.encoder == `function` ? e.encoder : M.encoder,
+		encodeValuesOnly: typeof e.encodeValuesOnly == `boolean` ? e.encodeValuesOnly : M.encodeValuesOnly,
+		filter: i,
+		format: t,
+		formatter: n,
+		serializeDate: typeof e.serializeDate == `function` ? e.serializeDate : M.serializeDate,
+		skipNulls: typeof e.skipNulls == `boolean` ? e.skipNulls : M.skipNulls,
+		sort: typeof e.sort == `function` ? e.sort : null,
+		strictNullHandling: typeof e.strictNullHandling == `boolean` ? e.strictNullHandling : M.strictNullHandling
+	};
+};
+function L(e, t) {
+	let n = e, r = I(t), i, a;
+	typeof r.filter == `function` ? (a = r.filter, n = a(``, n)) : D(r.filter) && (a = r.filter, i = a);
+	let o = [];
+	if (typeof n != `object` || !n) return ``;
+	let s = E[r.arrayFormat], c = s === `comma` && r.commaRoundTrip;
+	i || (i = Object.keys(n)), r.sort && i.sort(r.sort);
+	let l = /* @__PURE__ */ new WeakMap();
+	for (let e = 0; e < i.length; ++e) {
+		let t = i[e];
+		r.skipNulls && n[t] === null || k(o, F(n[t], t, s, c, r.allowEmptyArrays, r.strictNullHandling, r.skipNulls, r.encodeDotInKeys, r.encode ? r.encoder : null, r.filter, r.sort, r.allowDots, r.serializeDate, r.format, r.formatter, r.encodeValuesOnly, l));
+	}
+	let u = o.join(r.delimiter), d = r.addQueryPrefix === !0 ? `?` : ``;
+	return u.length > 0 ? d + u : ``;
+}
+var R = Object.prototype.hasOwnProperty;
+var z = Array.isArray;
+var B = {
+	allowDots: !1,
+	allowEmptyArrays: !1,
+	allowPrototypes: !1,
+	allowSparse: !1,
+	arrayLimit: 20,
+	comma: !1,
+	decodeDotInKeys: !1,
+	decoder: _,
+	delimiter: `&`,
+	depth: 5,
+	duplicates: `combine`,
+	ignoreQueryPrefix: !1,
+	parameterLimit: 1e3,
+	parseArrays: !0,
+	plainObjects: !1,
+	strictNullHandling: !1
+};
+var V = function(e, t) {
+	return e && typeof e == `string` && t.comma && e.indexOf(`,`) > -1 ? e.split(`,`) : e;
+};
+var H = function(e, t) {
+	let n = { __proto__: null }, r = t.ignoreQueryPrefix ? e.replace(/^\?/, ``) : e, i = t.parameterLimit === 1 / 0 ? void 0 : t.parameterLimit, a = r.split(t.delimiter, i), o = 0;
+	for (; o < a.length; ++o) {
+		let e = a[o], r = e.indexOf(`]=`), i = r === -1 ? e.indexOf(`=`) : r + 1, s, c;
+		i === -1 ? (s = t.decoder(e, B.decoder, `key`), c = t.strictNullHandling ? null : ``) : (s = t.decoder(e.slice(0, i), B.decoder, `key`), c = w(V(e.slice(i + 1), t), function(e) {
+			return t.decoder(e, B.decoder, `value`);
+		})), e.indexOf(`[]=`) > -1 && (c = z(c) ? [c] : c), t.comma && z(c) && c.length > t.arrayLimit && (c = C([], c, t.arrayLimit, t.plainObjects));
+		let l = R.call(n, s);
+		l && t.duplicates === `combine` ? n[s] = C(n[s], c, t.arrayLimit, t.plainObjects) : l && t.duplicates !== `last` || (n[s] = c);
+	}
+	return n;
+};
+var U = function(e, t, n, r) {
+	let i = r ? t : V(t, n);
+	for (let t = e.length - 1; t >= 0; --t) {
+		let r, a = e[t];
+		if (a === `[]` && n.parseArrays) r = u(i) ? i : n.allowEmptyArrays && (i === `` || n.strictNullHandling && i === null) ? [] : C([], i, n.arrayLimit, n.plainObjects);
+		else {
+			r = n.plainObjects ? Object.create(null) : {};
+			let e = a.charAt(0) === `[` && a.charAt(a.length - 1) === `]` ? a.slice(1, -1) : a, t = n.decodeDotInKeys ? e.replace(/%2E/g, `.`) : e, o = parseInt(t, 10), s = !isNaN(o) && a !== t && String(o) === t && o >= 0 && n.parseArrays;
+			!n.parseArrays && t === `` ? r = { 0: i } : s && o <= n.arrayLimit ? (r = [], r[o] = i) : s ? (r[o] = i, l(r, o)) : t !== `__proto__` && (r[t] = i);
+		}
+		i = r;
+	}
+	return i;
+};
+var W = function(e, t, n, r) {
+	if (!e) return;
+	let i = n.allowDots ? e.replace(/\.([^.[]+)/g, `[$1]`) : e, a = /(\[[^[\]]*])/, o = /(\[[^[\]]*])/g, s = n.depth > 0 && a.exec(i), c = s ? i.slice(0, s.index) : i, l = [];
+	if (c) {
+		if (!n.plainObjects && R.call(Object.prototype, c) && !n.allowPrototypes) return;
+		l.push(c);
+	}
+	let u = 0;
+	for (; n.depth > 0 && (s = o.exec(i)) !== null && u < n.depth;) {
+		if (u += 1, !n.plainObjects && R.call(Object.prototype, s[1].slice(1, -1)) && !n.allowPrototypes) return;
+		l.push(s[1]);
+	}
+	return s && l.push(`[` + i.slice(s.index) + `]`), U(l, t, n, r);
+};
+var G = function(e) {
+	if (!e) return B;
+	if (e.allowEmptyArrays !== void 0 && typeof e.allowEmptyArrays != `boolean`) throw TypeError("`allowEmptyArrays` option can only be `true` or `false`, when provided");
+	if (e.decodeDotInKeys !== void 0 && typeof e.decodeDotInKeys != `boolean`) throw TypeError("`decodeDotInKeys` option can only be `true` or `false`, when provided");
+	if (e.decoder !== null && e.decoder !== void 0 && typeof e.decoder != `function`) throw TypeError(`Decoder has to be a function.`);
+	let t = e.duplicates === void 0 ? B.duplicates : e.duplicates;
+	if (t !== `combine` && t !== `first` && t !== `last`) throw TypeError(`The duplicates option must be either combine, first, or last`);
+	return {
+		allowDots: e.allowDots === void 0 ? e.decodeDotInKeys === !0 || B.allowDots : !!e.allowDots,
+		allowEmptyArrays: typeof e.allowEmptyArrays == `boolean` ? !!e.allowEmptyArrays : B.allowEmptyArrays,
+		allowPrototypes: typeof e.allowPrototypes == `boolean` ? e.allowPrototypes : B.allowPrototypes,
+		allowSparse: typeof e.allowSparse == `boolean` ? e.allowSparse : B.allowSparse,
+		arrayLimit: typeof e.arrayLimit == `number` ? e.arrayLimit : B.arrayLimit,
+		comma: typeof e.comma == `boolean` ? e.comma : B.comma,
+		decodeDotInKeys: typeof e.decodeDotInKeys == `boolean` ? e.decodeDotInKeys : B.decodeDotInKeys,
+		decoder: typeof e.decoder == `function` ? e.decoder : B.decoder,
+		delimiter: typeof e.delimiter == `string` || x(e.delimiter) ? e.delimiter : B.delimiter,
+		depth: typeof e.depth == `number` || e.depth === !1 ? +e.depth : B.depth,
+		duplicates: t,
+		ignoreQueryPrefix: e.ignoreQueryPrefix === !0,
+		parameterLimit: typeof e.parameterLimit == `number` ? e.parameterLimit : B.parameterLimit,
+		parseArrays: e.parseArrays !== !1,
+		plainObjects: typeof e.plainObjects == `boolean` ? e.plainObjects : B.plainObjects,
+		strictNullHandling: typeof e.strictNullHandling == `boolean` ? e.strictNullHandling : B.strictNullHandling
+	};
+};
+function K(e, t) {
+	let n = G(t);
+	if (e === `` || e == null) return n.plainObjects ? Object.create(null) : {};
+	let r = typeof e == `string` ? H(e, n) : e, i = n.plainObjects ? Object.create(null) : {}, a = Object.keys(r);
+	for (let t = 0; t < a.length; ++t) {
+		let o = a[t], s = W(o, r[o], n, typeof e == `string`);
+		i = g(i, s, n);
+	}
+	return n.allowSparse === !0 ? i : b(i);
+}
+function q(e) {
+	return e.replace(/(%[0-9a-f]{2})+/gi, (e) => {
+		try {
+			return decodeURIComponent(e);
+		} catch (t) {
+			return e;
+		}
+	});
+}
+var J = class {
+	constructor(e, t, n) {
+		var r, i;
+		this.name = e, this.definition = t, this.bindings = (r = t.bindings) == null ? {} : r, this.wheres = (i = t.wheres) == null ? {} : i, this.config = n;
+	}
+	get template() {
+		let e = `${this.origin}/${this.definition.uri}`.replace(/\/+$/, ``);
+		return e === `` ? `/` : e;
+	}
+	get origin() {
+		return this.config.absolute ? this.definition.domain ? `${this.config.url.match(/^\w+:\/\//)[0]}${this.definition.domain}${this.config.port ? `:${this.config.port}` : ``}` : this.config.url : ``;
+	}
+	get parameterSegments() {
+		var e, t;
+		return (e = (t = this.template.match(/{[^}?]+\??}/g)) == null ? void 0 : t.map((e) => ({
+			name: e.replace(/{|\??}/g, ``),
+			required: !/\?}$/.test(e)
+		}))) == null ? [] : e;
+	}
+	matchesUrl(e) {
+		if (!this.definition.methods.includes(`GET`)) return !1;
+		let t = this.template.replace(/[.*+$()[\]]/g, `\\$&`).replace(/(\/?){([^}?]*)(\??)}/g, (e, t, n, r) => {
+			var i;
+			let a = `(?<${n}>${((i = this.wheres[n]) == null ? void 0 : i.replace(/(^\^)|(\$$)/g, ``)) || `[^/?]+`})`;
+			return r ? `(${t}${a})?` : `${t}${a}`;
+		}).replace(/^\w+:\/\//, ``), [n, r] = e.replace(/^\w+:\/\//, ``).split(`?`), i = RegExp(`^${t}/?$`).exec(n);
+		if (!i) try {
+			i = RegExp(`^${t}/?$`).exec(decodeURI(n));
+		} catch (e) {}
+		if (i) {
+			for (let e in i.groups) typeof i.groups[e] == `string` && (i.groups[e] = q(i.groups[e]));
+			return {
+				params: i.groups,
+				query: K(r)
+			};
+		}
+		return !1;
+	}
+	compile(e) {
+		return this.parameterSegments.length ? this.template.replace(/{([^}?]+)(\??)}/g, (t, n, r) => {
+			var i;
+			if (!r && [null, void 0].includes(e[n])) throw Error(`Ziggy error: '${n}' parameter is required for route '${this.name}'.`);
+			if (this.wheres[n]) {
+				var a;
+				if (!RegExp(`^${r ? `(${this.wheres[n]})?` : this.wheres[n]}$`).test((a = e[n]) == null ? `` : a)) throw Error(`Ziggy error: '${n}' parameter '${e[n]}' does not match required format '${this.wheres[n]}' for route '${this.name}'.`);
+			}
+			return encodeURI((i = e[n]) == null ? `` : i).replace(/%7C/g, `|`).replace(/%25/g, `%`).replace(/\$/g, `%24`);
+		}).replace(this.config.absolute ? /(\.[^/]+?)(\/\/)/ : /(^)(\/\/)/, `$1/`).replace(/\/+$/, ``) : this.template;
+	}
+};
+function Y(e) {
+	"@babel/helpers - typeof";
+	return Y = typeof Symbol == `function` && typeof Symbol.iterator == `symbol` ? function(e) {
+		return typeof e;
+	} : function(e) {
+		return e && typeof Symbol == `function` && e.constructor === Symbol && e !== Symbol.prototype ? `symbol` : typeof e;
+	}, Y(e);
+}
+function X(e, t) {
+	if (Y(e) != `object` || !e) return e;
+	var n;
+	if (typeof Symbol < `u` && (n = e[Symbol.toPrimitive]) !== void 0) {
+		var r = n.call(e, t || `default`);
+		if (Y(r) != `object`) return r;
+		throw TypeError(`@@toPrimitive must return a primitive value.`);
+	}
+	return (t === `string` ? String : Number)(e);
+}
+function ee(e) {
+	var t = X(e, `string`);
+	return Y(t) == `symbol` ? t : t + ``;
+}
+function te(e, t, n) {
+	return (t = ee(t)) in e ? Object.defineProperty(e, t, {
+		value: n,
+		enumerable: !0,
+		configurable: !0,
+		writable: !0
+	}) : e[t] = n, e;
+}
+function Z(e, t) {
+	var n = Object.keys(e);
+	if (Object.getOwnPropertySymbols) {
+		var r = Object.getOwnPropertySymbols(e);
+		t && (r = r.filter(function(t) {
+			return Object.getOwnPropertyDescriptor(e, t).enumerable;
+		})), n.push.apply(n, r);
+	}
+	return n;
+}
+function Q(e) {
+	for (var t = 1; t < arguments.length; t++) {
+		var n = arguments[t] == null ? {} : arguments[t];
+		t % 2 ? Z(Object(n), !0).forEach(function(t) {
+			te(e, t, n[t]);
+		}) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(n)) : Z(Object(n)).forEach(function(t) {
+			Object.defineProperty(e, t, Object.getOwnPropertyDescriptor(n, t));
+		});
+	}
+	return e;
+}
+var ne = class extends String {
+	constructor(e, t, n = !0, r) {
+		var i;
+		if (super(), this._config = r == null ? typeof Ziggy < `u` ? Ziggy : (i = globalThis) == null ? void 0 : i.Ziggy : r, !this._config && typeof document < `u` && document.getElementById(`ziggy-routes-json`) && (globalThis.Ziggy = JSON.parse(document.getElementById(`ziggy-routes-json`).textContent), this._config = globalThis.Ziggy), this._config = Q(Q({}, this._config), {}, { absolute: n }), e) {
+			if (!this._config.routes[e]) throw Error(`Ziggy error: route '${e}' is not in the route list.`);
+			this._route = new J(e, this._config.routes[e], this._config), this._params = this._parse(t);
+		}
+	}
+	toString() {
+		let e = Object.keys(this._params).filter((e) => !this._route.parameterSegments.some(({ name: t }) => t === e)).filter((e) => e !== `_query`).reduce((e, t) => Q(Q({}, e), {}, { [t]: this._params[t] }), {});
+		return this._route.compile(this._params) + L(Q(Q({}, e), this._params._query), {
+			addQueryPrefix: !0,
+			arrayFormat: `indices`,
+			encodeValuesOnly: !0,
+			skipNulls: !0,
+			encoder: (e, t) => typeof e == `boolean` ? Number(e) : t(e)
+		});
+	}
+	_unresolve(e) {
+		e ? this._config.absolute && e.startsWith(`/`) && (e = this._location().host + e) : e = this._currentUrl();
+		let t = {}, [n, r] = Object.entries(this._config.routes).find(([n, r]) => t = new J(n, r, this._config).matchesUrl(e)) || [void 0, void 0];
+		return Q(Q({ name: n }, t), {}, { route: r });
+	}
+	_currentUrl() {
+		let { host: e, pathname: t, search: n } = this._location();
+		return (this._config.absolute ? e + t : t.replace(this._config.url.replace(/^\w*:\/\/[^/]+/, ``), ``).replace(/^\/+/, `/`)) + n;
+	}
+	current(e, t) {
+		let { name: n, params: r, query: i, route: a } = this._unresolve();
+		if (!e) return n;
+		let o = RegExp(`^${e.replace(/\./g, `\\.`).replace(/\*/g, `.*`)}$`).test(n);
+		if ([null, void 0].includes(t) || !o) return o;
+		let s = new J(n, a, this._config);
+		t = this._parse(t, s);
+		let c = Q(Q({}, r), i);
+		if (Object.values(t).every((e) => !e) && !Object.values(c).some((e) => e !== void 0)) return !0;
+		let l = (e, t) => Object.entries(e).every(([e, n]) => Array.isArray(n) && Array.isArray(t[e]) ? n.every((n) => t[e].includes(n) || t[e].includes(q(String(n)))) : typeof n == `object` && typeof t[e] == `object` && n !== null && t[e] !== null ? l(n, t[e]) : t[e] == n || t[e] == q(String(n)));
+		return l(t, c);
+	}
+	_location() {
+		var e, t, n;
+		let { host: r = ``, pathname: i = ``, search: a = `` } = typeof window < `u` ? window.location : {}, o = typeof this._config.location == `string` ? new URL(this._config.location) : this._config.location;
+		return {
+			host: (e = o == null ? void 0 : o.host) == null ? r : e,
+			pathname: (t = o == null ? void 0 : o.pathname) == null ? i : t,
+			search: (n = o == null ? void 0 : o.search) == null ? a : n
+		};
+	}
+	get params() {
+		let { params: e, query: t } = this._unresolve();
+		return Q(Q({}, e), t);
+	}
+	get routeParams() {
+		return this._unresolve().params;
+	}
+	get queryParams() {
+		return this._unresolve().query;
+	}
+	has(e) {
+		return this._config.routes.hasOwnProperty(e);
+	}
+	_parse(e = {}, t = this._route) {
+		e ??= {}, e = [`string`, `number`].includes(typeof e) ? [e] : e;
+		let n = t.parameterSegments.filter(({ name: e }) => !this._config.defaults[e]);
+		return Array.isArray(e) ? e = e.reduce((e, t, r) => n[r] ? Q(Q({}, e), {}, { [n[r].name]: t }) : typeof t == `object` ? Q(Q({}, e), t) : Q(Q({}, e), {}, { [t]: `` }), {}) : n.length === 1 && !e.hasOwnProperty(n[0].name) && (e.hasOwnProperty(Object.values(t.bindings)[0]) || e.hasOwnProperty(`id`)) && (e = { [n[0].name]: e }), Q(Q({}, this._defaults(t)), this._substituteBindings(e, t));
+	}
+	_defaults(e) {
+		return e.parameterSegments.filter(({ name: e }) => this._config.defaults[e]).reduce((e, { name: t }, n) => Q(Q({}, e), {}, { [t]: this._config.defaults[t] }), {});
+	}
+	_substituteBindings(e, { bindings: t, parameterSegments: n }) {
+		return Object.entries(e).reduce((e, [r, i]) => {
+			if (!i || typeof i != `object` || Array.isArray(i) || !n.some(({ name: e }) => e === r)) return Q(Q({}, e), {}, { [r]: i });
+			let a = i.hasOwnProperty(t[r]) ? t[r] : i.hasOwnProperty(`id`) ? `id` : void 0;
+			if (a === void 0) throw Error(`Ziggy error: object passed as '${r}' parameter is missing route model binding key '${t[r]}'.`);
+			return Q(Q({}, e), {}, { [r]: i[a] });
+		}, {});
+	}
+	valueOf() {
+		return this.toString();
+	}
+};
+function $(e, t, n, r) {
+	let i = new ne(e, t, n, r);
+	return e ? i.toString() : i;
+}
+// resources/js/ssr.ts
+var appName = "Matos";
+server_default((page) => createInertiaApp({
+	page,
+	render: import_server_renderer_cjs_prod.renderToString,
+	title: (title) => `${title} - ${appName}`,
+	resolve: (name) => resolvePageComponent(`./pages/${name}.vue`, /* #__PURE__ */ Object.assign({
+		"./pages/Admin/Categories/Create.vue": () => import("./assets/Create-Ba3gLWiO.js"),
+		"./pages/Admin/Categories/Edit.vue": () => import("./assets/Edit-BVraDpQp.js"),
+		"./pages/Admin/Categories/Index.vue": () => import("./assets/Index-D8IplBbd.js"),
+		"./pages/Admin/Dashboard.vue": () => import("./assets/Dashboard-DePfCpxO.js"),
+		"./pages/Admin/Equipments/Index.vue": () => import("./assets/Index-L3RZBWYH.js"),
+		"./pages/Admin/Equipments/Show.vue": () => import("./assets/Show-D94fQ_2S.js"),
+		"./pages/Admin/Newsletters/Create.vue": () => import("./assets/Create-kn-BRmRd.js"),
+		"./pages/Admin/Newsletters/Edit.vue": () => import("./assets/Edit-COYCoHGq.js"),
+		"./pages/Admin/Newsletters/Index.vue": () => import("./assets/Index-CVL3mUXh.js"),
+		"./pages/Admin/Users/Create.vue": () => import("./assets/Create-BNnKrRtu.js"),
+		"./pages/Admin/Users/Edit.vue": () => import("./assets/Edit-p7GU1yX7.js"),
+		"./pages/Admin/Users/Index.vue": () => import("./assets/Index-CHyxIahk.js"),
+		"./pages/App/Dashboard.vue": () => import("./assets/Dashboard-DUm9nekB.js"),
+		"./pages/App/Organizations/Calendar/Index.vue": () => import("./assets/Index-8PCeCKEj.js"),
+		"./pages/App/Organizations/Create.vue": () => import("./assets/Create-C3Z2hFh_.js"),
+		"./pages/App/Organizations/Equipments/Create.vue": () => import("./assets/Create-3IGgux39.js"),
+		"./pages/App/Organizations/Equipments/Edit.vue": () => import("./assets/Edit-wBWTOc4S.js"),
+		"./pages/App/Organizations/Equipments/Index.vue": () => import("./assets/Index-B9gB-WJ2.js"),
+		"./pages/App/Organizations/Index.vue": () => import("./assets/Index-BSLnyC_J.js"),
+		"./pages/App/Organizations/Reservations/In/Edit.vue": () => import("./assets/Edit-CVMuJARx.js"),
+		"./pages/App/Organizations/Reservations/In/Index.vue": () => import("./assets/Index-BdKDciT6.js"),
+		"./pages/App/Organizations/Reservations/Layout.vue": () => import("./assets/Layout-D60MvQl6.js"),
+		"./pages/App/Organizations/Reservations/Out/Create.vue": () => import("./assets/Create-DfQRXjxF.js"),
+		"./pages/App/Organizations/Reservations/Out/Edit.vue": () => import("./assets/Edit-BqOyXLLK.js"),
+		"./pages/App/Organizations/Reservations/Out/Index.vue": () => import("./assets/Index-CVz4-UYo.js"),
+		"./pages/App/Organizations/Settings/Depots/Create.vue": () => import("./assets/Create-DCZMCC04.js"),
+		"./pages/App/Organizations/Settings/Depots/Edit.vue": () => import("./assets/Edit-Cso6BwPM.js"),
+		"./pages/App/Organizations/Settings/Depots/Index.vue": () => import("./assets/Index-BYy-zMTL.js"),
+		"./pages/App/Organizations/Settings/Edit.vue": () => import("./assets/Edit-Cl9MR9wP.js"),
+		"./pages/App/Organizations/Settings/Members/Index.vue": () => import("./assets/Index-BzuFc-1p.js"),
+		"./pages/App/Organizations/Settings/Partials/DeleteOrganization.vue": () => import("./assets/DeleteOrganization-BXVnq6_-.js"),
+		"./pages/App/Organizations/Settings/Partials/DepotsManagement.vue": () => import("./assets/DepotsManagement-IOsv3LdQ.js"),
+		"./pages/App/Organizations/Settings/Partials/GeneralForm.vue": () => import("./assets/GeneralForm-DKjzVaPt.js"),
+		"./pages/App/Organizations/Settings/Partials/MembersManagement.vue": () => import("./assets/MembersManagement-CKV7WPTh.js"),
+		"./pages/App/Organizations/Show.vue": () => import("./assets/Show-N9XZCoO5.js"),
+		"./pages/Conditions.vue": () => import("./assets/Conditions-Dmn52WyE.js"),
+		"./pages/Discover.vue": () => import("./assets/Discover-D1pfNoU8.js"),
+		"./pages/Faq.vue": () => import("./assets/Faq-CaIGEOSr.js"),
+		"./pages/HowItWorks.vue": () => import("./assets/HowItWorks-CTnl-exO.js"),
+		"./pages/Privacy.vue": () => import("./assets/Privacy-B6QflXG2.js"),
+		"./pages/Public/Carts/Show.vue": () => import("./assets/Show-CDN23jx0.js"),
+		"./pages/Public/Checkout/Index.vue": () => import("./assets/Index-CcnZdbUC.js"),
+		"./pages/Public/Checkout/Success.vue": () => import("./assets/Success-CQ-hpfJ6.js"),
+		"./pages/Public/Equipments/Show.vue": () => import("./assets/Show-W-jc2Zw6.js"),
+		"./pages/Public/Home.vue": () => import("./assets/Home-B2P6dp63.js"),
+		"./pages/Terms.vue": () => import("./assets/Terms-Dos43Xa6.js"),
+		"./pages/auth/ConfirmPassword.vue": () => import("./assets/ConfirmPassword-YayI-SA5.js"),
+		"./pages/auth/ForgotPassword.vue": () => import("./assets/ForgotPassword-GGUhRi5D.js"),
+		"./pages/auth/Login.vue": () => import("./assets/Login-DRfGl-K_.js"),
+		"./pages/auth/Register.vue": () => import("./assets/Register-Dt3FVq9H.js"),
+		"./pages/auth/ResetPassword.vue": () => import("./assets/ResetPassword-BxFIZN_r.js"),
+		"./pages/auth/VerifyEmail.vue": () => import("./assets/VerifyEmail-BHfFkbug.js"),
+		"./pages/settings/Appearance.vue": () => import("./assets/Appearance-oCSRiJMK.js"),
+		"./pages/settings/Password.vue": () => import("./assets/Password-BJsNw8Ip.js"),
+		"./pages/settings/Profile.vue": () => import("./assets/Profile-oCia6Eoq.js")
+	})),
+	setup({ App, props, plugin }) {
+		const app = (0, vue_exports.createSSRApp)({ render: () => (0, vue_exports.h)(App, props) });
+		const ziggyConfig = {
+			...page.props.ziggy,
+			location: new URL(page.props.ziggy.location)
+		};
+		const route = (name, params, absolute) => $(name, params, absolute, ziggyConfig);
+		app.config.globalProperties.route = route;
+		if (typeof window === "undefined") global.route = route;
+		app.use(plugin);
+		return app;
+	}
+}), { port: 13714 });
+export { useForm as a, vue_exports as c, __toESM as d, router12 as i, __exportAll as l, head_default as n, usePage as o, link_default as r, whenVisible_default as s, require_server_renderer_cjs_prod as t, __reExport as u };

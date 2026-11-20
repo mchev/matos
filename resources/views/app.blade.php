@@ -30,8 +30,8 @@
             }
         </style>
 
-        <title inertia>{{ config('app.name', 'matos.live') }}</title>
-        <meta inertia name="description" content="{{ config('app.description') }}">
+        <title data-inertia>{{ config('app.name', 'matos.live') }}</title>
+        <meta data-inertia name="description" content="{{ config('app.description') }}">
 
         <link rel="manifest" href="/manifest.json">
         <meta name="theme-color" content="#0f172a">
@@ -51,11 +51,11 @@
         <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 
-        <meta inertia name="og:image" content="{{ asset('screenshot.png') }}">
-        <meta inertia name="og:title" content="{{ config('app.name') }}">
-        <meta inertia name="og:description" content="{{ config('app.description') }}">
-        <meta inertia name="og:url" content="{{ config('app.url') }}">
-        <meta inertia name="og:type" content="website">
+        <meta data-inertia name="og:image" content="{{ asset('screenshot.png') }}">
+        <meta data-inertia name="og:title" content="{{ config('app.name') }}">
+        <meta data-inertia name="og:description" content="{{ config('app.description') }}">
+        <meta data-inertia name="og:url" content="{{ config('app.url') }}">
+        <meta data-inertia name="og:type" content="website">
 
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=open-sans:400,500,600" rel="stylesheet" />
